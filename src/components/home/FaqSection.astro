@@ -1,0 +1,17 @@
+---
+interface FaqItem { question: string; answer: string; }
+interface Props { items: FaqItem[]; }
+const { items } = Astro.props;
+---
+{items.length > 0 && <section class="section faq-section"><div class="container"><header><span>الأسئلة الشائعة</span><h2>إجابات واضحة قبل بدء العمل</h2><p>معلومات مختصرة عن المعاينة والتجهيز واختيار الخامات وتنفيذ الخدمات.</p></header><div class="faq-list">{items.map((item, index) => <details open={index === 0}><summary>{item.question}</summary><p>{item.answer}</p></details>)}</div></div></section>}
+<style>
+  .faq-section { background: white; }
+  header { max-width: 760px; margin-bottom: 2rem; }
+  header span { color: var(--color-primary-dark); font-weight: 800; }
+  header h2 { margin-block: .5rem .7rem; font-size: clamp(2rem, 5vw, 3.3rem); }
+  header p { margin: 0; color: var(--color-text-muted); }
+  .faq-list { display: grid; gap: .75rem; max-width: 920px; }
+  details { border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+  summary { cursor: pointer; padding: 1rem 1.2rem; font-weight: 850; }
+  details p { margin: 0; padding: 0 1.2rem 1.2rem; color: var(--color-text-muted); }
+</style>

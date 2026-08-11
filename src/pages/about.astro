@@ -1,0 +1,38 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/common/PageHero.astro";
+import PostContactButtons from "../components/blog/PostContactButtons.astro";
+const entry = await getEntry("settings", "site");
+if (!entry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = entry.data;
+const serviceSummary = settings.services.length ? settings.services.join("، ") : "الخدمات المتاحة";
+---
+<BaseLayout title="من نحن" description={`تعرف على طريقة عمل ${settings.siteName} في ${settings.city} ومراحل المعاينة والتجهيز والتنفيذ.`} image={settings.aboutImage} imageAlt={settings.aboutImageAlt} pageType="AboutPage">
+  <main id="main-content">
+    <PageHero eyebrow="من نحن" title={settings.aboutTitle} description={settings.aboutDescription} image={settings.aboutImage} imageAlt={settings.aboutImageAlt} />
+    <section class="section">
+      <div class="container about-layout">
+        <article class="prose">
+          <h2>كيف نعمل؟</h2>
+          <p>تبدأ الخدمة بفهم نوع الموقع وحالته ونطاق العمل المطلوب. بعد المعاينة نحدد أعمال التجهيز ونقترح الخامات والحلول المناسبة، ثم ننظم مراحل التنفيذ لتقليل التعارض بين الأعمال المختلفة.</p>
+          <h2>ما الذي نهتم به؟</h2>
+          <p>نهتم بالتجهيز الصحيح قبل التنفيذ، وحماية الموقع، وضبط التفاصيل المتفق عليها، والمتابعة حتى تسليم العمل بصورة منظمة وواضحة.</p>
+          <h2>نطاق خدماتنا</h2>
+          <p>{`نقدم خدماتنا في ${settings.city} وتشمل: ${serviceSummary}.`}</p>
+        </article>
+        <aside><h2>مبادئ التنفيذ</h2><ul>{settings.aboutFeatures.map((feature) => <li><span aria-hidden="true">✓</span>{feature}</li>)}</ul></aside>
+      </div>
+      <div class="container"><PostContactButtons city={settings.city} phone={settings.phone} phoneDisplay={settings.phoneDisplay} whatsapp={settings.whatsapp} title={`ناقش معنا مشروعك في ${settings.city}`} whatsappMessage={`مرحبًا، أريد الاستفسار عن طريقة العمل لدى ${settings.siteName}`} /></div>
+    </section>
+  </main>
+</BaseLayout>
+<style>
+  .about-layout { display: grid; gap: 2.5rem; align-items: start; }
+  aside { padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  aside h2 { font-size: 1.35rem; }
+  aside ul { display: grid; gap: .7rem; padding: 0; list-style: none; }
+  aside li { display: flex; gap: .55rem; font-weight: 700; }
+  aside li span { color: var(--color-primary-dark); }
+  @media (min-width: 900px) { .about-layout { grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); } }
+</style>

@@ -1,0 +1,16 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="الصفحة غير موجودة" description="تعذر العثور على الصفحة المطلوبة." noindex={true}>
+  <main id="main-content" class="not-found"><div class="container"><span>404</span><h1>الصفحة التي تبحث عنها غير موجودة</h1><p>ربما تغيّر الرابط أو حُذفت الصفحة. يمكنك العودة إلى الرئيسية أو استعراض الخدمات.</p><div><a class="primary" href="/">العودة إلى الرئيسية</a><a href="/services/">استعراض الخدمات</a></div></div></main>
+</BaseLayout>
+<style>
+  .not-found { display: grid; min-height: 65vh; place-items: center; padding-block: 4rem; text-align: center; }
+  .not-found .container { max-width: 760px; }
+  .not-found span { color: var(--color-primary); font-size: clamp(4rem, 18vw, 9rem); font-weight: 900; line-height: 1; opacity: .22; }
+  h1 { margin-block: .5rem 1rem; font-size: clamp(2rem, 7vw, 4rem); }
+  p { color: var(--color-text-muted); }
+  .not-found div > div { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; margin-top: 1.4rem; }
+  a { display: inline-flex; min-height: 48px; align-items: center; padding-inline: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: white; font-weight: 800; }
+  .primary { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+</style>

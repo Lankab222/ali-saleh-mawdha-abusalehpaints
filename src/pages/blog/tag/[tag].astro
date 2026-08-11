@@ -1,0 +1,33 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, getEntry } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageHero from "../../../components/common/PageHero.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
+  return tags.map((tag) => ({ params: { tag }, props: { tag, posts: posts.filter((post) => post.data.tags.includes(tag)) } }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+const sortedPosts = [...posts].sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+const seoSettingsEntry = await getEntry("seoSettings", "settings");
+if (!seoSettingsEntry) throw new Error("ملف إعدادات السيو غير موجود");
+const seoSettings = seoSettingsEntry.data;
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+---
+<BaseLayout title={`وسم ${tag}`} noindex={seoSettings.noindexTagPages}
+  description={`مقالات مرتبطة بوسم ${tag} من ${settings.siteName}.`} pageType="CollectionPage">
+  <main id="main-content"><PageHero eyebrow="وسم المقالات" title={`#${tag}`} description={`جميع المقالات المرتبطة بوسم ${tag}.`} /><section class="section"><div class="container posts-list">{sortedPosts.length > 0 ? sortedPosts.map((post) => <article><div><span>{post.data.category}</span><h2><a href={`/blog/${post.id}/`}>{post.data.title}</a></h2><p>{post.data.description}</p></div><a href={`/blog/${post.id}/`}>قراءة المقال ←</a></article>) : <p class="empty-state">لا توجد مقالات مرتبطة بهذا الوسم.</p>}</div></section></main>
+</BaseLayout>
+<style>
+  .posts-list { display: grid; gap: 1rem; }
+  article { display: grid; gap: 1rem; padding: 1.3rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  article span, article > a { color: var(--color-primary-dark); font-size: .84rem; font-weight: 800; }
+  h2 { margin-block: .5rem; font-size: 1.3rem; }
+  p { color: var(--color-text-muted); }
+  @media (min-width: 760px) { article { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+</style>

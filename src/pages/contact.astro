@@ -1,0 +1,25 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/common/PageHero.astro";
+const entry = await getEntry("settings", "site");
+if (!entry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = entry.data;
+---
+<BaseLayout title="تواصل معنا" description={`تواصل مع ${settings.siteName} عبر الهاتف أو واتساب لطلب الخدمة أو المعاينة في ${settings.city}.`} pageType="ContactPage">
+  <main id="main-content">
+    <PageHero eyebrow="تواصل معنا" title="أرسل تفاصيل المشروع وحدد الخدمة المطلوبة" description={`اذكر نوع الموقع والمنطقة والخدمة المطلوبة، وسنتواصل معك لتنسيق الخطوة التالية في ${settings.city}.`} />
+    <section class="section"><div class="container contact-grid"><section><h2>طرق التواصل</h2><p>يمكنك الاتصال مباشرة أو إرسال رسالة واتساب تتضمن صور الموقع والخدمة المطلوبة.</p><div class="contact-cards">{settings.phone && <a href={`tel:${settings.phone}`}><strong>اتصال مباشر</strong><span>{settings.phoneDisplay || settings.phone}</span></a>}{settings.whatsapp && <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer"><strong>واتساب</strong><span>{settings.phoneDisplay || settings.whatsapp}</span></a>}{settings.email && <a href={`mailto:${settings.email}`}><strong>البريد الإلكتروني</strong><span>{settings.email}</span></a>}{settings.googleBusinessProfileUrl && <a href={settings.googleBusinessProfileUrl} target="_blank" rel="noopener noreferrer"><strong>Google Business</strong><span>عرض النشاط على خرائط Google</span></a>}{settings.address && <div><strong>نطاق الخدمة</strong><span>{settings.address}</span></div>}</div></section><aside><h2>قبل إرسال الطلب</h2><ul><li>حدد نوع الموقع أو المشروع.</li><li>{`اكتب الحي أو المنطقة داخل ${settings.city}.`}</li><li>اذكر الخدمة المطلوبة والمساحة التقريبية.</li><li>أرفق صورًا واضحة عند توفرها.</li><li>لا تعتمد الأسعار النهائية إلا بعد تحديد نطاق العمل والخامات.</li></ul></aside></div></section>
+  </main>
+</BaseLayout>
+<style>
+  .contact-grid { display: grid; gap: 2rem; align-items: start; }
+  .contact-grid > section > p { color: var(--color-text-muted); }
+  .contact-cards { display: grid; gap: .8rem; margin-top: 1.3rem; }
+  .contact-cards a, .contact-cards div { display: grid; gap: .1rem; padding: 1.1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+  .contact-cards a:hover { border-color: var(--color-primary); }
+  .contact-cards span { color: var(--color-text-muted); overflow-wrap: anywhere; }
+  aside { padding: 1.4rem; border-radius: var(--radius-lg); background: var(--color-primary-soft); }
+  aside ul { padding-inline-start: 1.3rem; }
+  @media (min-width: 900px) { .contact-grid { grid-template-columns: minmax(0, 1fr) minmax(320px, .7fr); } }
+</style>

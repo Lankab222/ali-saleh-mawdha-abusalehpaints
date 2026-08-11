@@ -1,0 +1,18 @@
+---
+interface BreadcrumbItem { label: string; href?: string; }
+interface Props { items: BreadcrumbItem[]; }
+const { items } = Astro.props;
+---
+<nav class="breadcrumbs" aria-label="مسار التنقل">
+  <ol class="container">
+    {items.map((item, index) => <li>{item.href && index < items.length - 1 ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}{index < items.length - 1 && <span class="separator" aria-hidden="true">/</span>}</li>)}
+  </ol>
+</nav>
+<style>
+  .breadcrumbs { border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+  .breadcrumbs ol { display: flex; flex-wrap: wrap; gap: .42rem; margin-block: 0; padding-block: .8rem; list-style: none; color: var(--color-text-muted); font-size: .86rem; }
+  .breadcrumbs li { display: inline-flex; align-items: center; gap: .42rem; }
+  .breadcrumbs a:hover { color: var(--color-primary); }
+  .breadcrumbs span[aria-current="page"] { color: var(--color-text); font-weight: 700; }
+  .separator { opacity: .45; }
+</style>

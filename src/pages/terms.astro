@@ -1,0 +1,11 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+---
+<BaseLayout title="شروط الاستخدام" description={`شروط استخدام موقع ${settings.siteName}.`}>
+  <main id="main-content"><section class="section"><article class="container legal prose"><h1>شروط الاستخدام</h1><p>استخدامك للموقع يعني موافقتك على الشروط التالية.</p><h2>المحتوى</h2><p>المعلومات المعروضة تعريفية، وقد تختلف الخامات والتكاليف ومدة التنفيذ بحسب حالة الموقع والمساحة ونطاق العمل.</p><h2>الأسعار والعروض</h2><p>لا يعد أي سعر تقريبي أو وصف عام عرضًا نهائيًا. يتم اعتماد النطاق والتكلفة بعد المعاينة والاتفاق الواضح.</p><h2>الصور والمشاريع</h2><p>يجب استخدام صور حقيقية أو مرخصة عند تحديث الموقع، مع احترام حقوق أصحاب الصور.</p><h2>التواصل</h2><p>إرسال طلب عبر واتساب أو الهاتف لا ينشئ التزامًا تعاقديًا إلا بعد الاتفاق على تفاصيل الخدمة.</p></article></section></main>
+</BaseLayout>
+<style>.legal { max-width: 850px; }.legal h1 { font-size: clamp(2.2rem, 7vw, 4rem); }</style>

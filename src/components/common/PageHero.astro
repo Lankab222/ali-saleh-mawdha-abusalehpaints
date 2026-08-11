@@ -1,0 +1,27 @@
+---
+import SmartImage from "./SmartImage.astro";
+interface Props { eyebrow?: string; title: string; description?: string; image?: string; imageAlt?: string; }
+const { eyebrow, title, description, image, imageAlt } = Astro.props;
+---
+<section class="page-hero">
+  <div class="container page-hero__grid">
+    <div class="page-hero__content">
+      {eyebrow && <span class="page-hero__eyebrow">{eyebrow}</span>}
+      <h1>{title}</h1>
+      {description && <p>{description}</p>}
+    </div>
+    {image && <div class="page-hero__media"><SmartImage src={image} alt={imageAlt || title} width={760} height={520} sizes="(min-width: 900px) 42vw, 100vw" role="hero" watermark={false} priority /></div>}
+  </div>
+</section>
+<style>
+  .page-hero { position: relative; overflow: hidden; padding-block: clamp(3rem, 8vw, 6rem); background: radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--color-primary) 13%, transparent), transparent 35%), linear-gradient(180deg, white, var(--color-surface)); }
+  .page-hero__grid { position: relative; display: grid; gap: 2.4rem; align-items: center; }
+  .page-hero__content { max-width: 820px; }
+  .page-hero__eyebrow { display: inline-flex; margin-bottom: 1rem; padding: .38rem .8rem; border: 1px solid var(--color-border); border-radius: 999px; background: white; color: var(--color-primary); font-size: .88rem; font-weight: 800; }
+  .page-hero h1 { max-width: 20ch; margin-bottom: 1.15rem; font-size: clamp(2rem, 8vw, 4.5rem); line-height: 1.18; letter-spacing: -.02em; text-wrap: balance; }
+  .page-hero p { max-width: 740px; margin: 0; color: var(--color-text-muted); font-size: clamp(1rem, 2.4vw, 1.2rem); }
+  .page-hero__media { overflow: hidden; border: 1px solid var(--color-border); border-radius: 2rem; background: white; box-shadow: var(--shadow-md); }
+  .page-hero__media :global(img) { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; }
+  @media (min-width: 900px) { .page-hero__grid { grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr); gap: clamp(3rem, 6vw, 6rem); } .page-hero:not(:has(.page-hero__media)) .page-hero__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .page-hero { padding-block: 2.75rem; } .page-hero h1 { font-size: clamp(1.9rem, 9vw, 2.45rem); } .page-hero p { line-height: 1.8; } }
+</style>

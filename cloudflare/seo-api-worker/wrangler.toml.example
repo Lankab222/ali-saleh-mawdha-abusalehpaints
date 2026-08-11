@@ -1,0 +1,12 @@
+name = "jeddah-seo-api"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://paintsriyadh.site"
+SEARCH_CONSOLE_PROPERTY = "sc-domain:paintsriyadh.site"
+
+# أضف الأسرار عبر لوحة Cloudflare أو wrangler secret put:
+# GOOGLE_SERVICE_ACCOUNT_EMAIL
+# GOOGLE_PRIVATE_KEY
+# PAGESPEED_API_KEY (اختياري)

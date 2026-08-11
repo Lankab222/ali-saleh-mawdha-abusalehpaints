@@ -1,0 +1,21 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+interface ServiceItem { id: string; data: { title: string; description: string; shortDescription?: string; image?: string; imageAlt?: string; }; }
+interface Props { services: ServiceItem[]; }
+const { services } = Astro.props;
+---
+{services.length > 0 && <section class="related-services"><header><span>خدمات أخرى</span><h2>قد تناسب مشروعك</h2></header><div>{services.map((service) => <article>{service.data.image && <a class="media" href={`/services/${service.id}/`}><SmartImage src={service.data.image} alt={service.data.imageAlt || service.data.title} width={700} height={450} sizes="(min-width: 720px) 33vw, 100vw" role="service" /></a>}<section><h3><a href={`/services/${service.id}/`}>{service.data.title}</a></h3><p>{service.data.shortDescription || service.data.description}</p><a class="more" href={`/services/${service.id}/`}>تفاصيل الخدمة ←</a></section></article>)}</div></section>}
+<style>
+  .related-services { margin-top: 4rem; }
+  header { margin-bottom: 1.4rem; }
+  header span, .more { color: var(--color-primary-dark); font-weight: 800; }
+  header h2 { margin-block: .45rem 0; font-size: clamp(1.7rem, 4vw, 2.4rem); }
+  .related-services > div { display: grid; gap: 1rem; }
+  article { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .media { display: block; overflow: hidden; aspect-ratio: 16 / 10; }
+  .related-services :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  article > section { padding: 1.1rem; }
+  h3 { margin-bottom: .55rem; }
+  p { color: var(--color-text-muted); }
+  @media (min-width: 720px) { .related-services > div { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

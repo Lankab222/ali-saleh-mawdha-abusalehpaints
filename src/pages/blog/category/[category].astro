@@ -1,0 +1,38 @@
+---
+import SmartImage from "../../../components/common/SmartImage.astro";
+import type { GetStaticPaths } from "astro";
+import { getCollection, getEntry } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageHero from "../../../components/common/PageHero.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const categories = [...new Set(posts.map((post) => post.data.category))];
+  return categories.map((category) => ({ params: { category }, props: { category, posts: posts.filter((post) => post.data.category === category) } }));
+}) satisfies GetStaticPaths;
+
+const { category, posts } = Astro.props;
+const sortedPosts = [...posts].sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+const seoSettingsEntry = await getEntry("seoSettings", "settings");
+if (!seoSettingsEntry) throw new Error("ملف إعدادات السيو غير موجود");
+const seoSettings = seoSettingsEntry.data;
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+---
+<BaseLayout title={`تصنيف ${category}`} noindex={seoSettings.noindexCategoryPages}
+  description={`مقالات ونصائح ضمن تصنيف ${category} من ${settings.siteName}.`} pageType="CollectionPage">
+  <main id="main-content"><PageHero eyebrow="تصنيف المقالات" title={category} description={`جميع المقالات المنشورة ضمن تصنيف ${category}.`} /><section class="section"><div class="container">{sortedPosts.length > 0 ? <div class="posts-grid">{sortedPosts.map((post) => <article>{post.data.image && <a class="media" href={`/blog/${post.id}/`}><SmartImage src={post.data.image} alt={post.data.imageAlt || post.data.title} width={800} height={500} sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 100vw" role="blog" /></a>}<div><span>{post.data.category}</span><h2><a href={`/blog/${post.id}/`}>{post.data.title}</a></h2><p>{post.data.description}</p><a class="more" href={`/blog/${post.id}/`}>قراءة المقال ←</a></div></article>)}</div> : <p class="empty-state">لا توجد مقالات في هذا التصنيف.</p>}</div></section></main>
+</BaseLayout>
+<style>
+  .posts-grid { display: grid; gap: 1.2rem; }
+  article { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .media { display: block; overflow: hidden; aspect-ratio: 16 / 10; }
+  .posts-grid :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  article > div { padding: 1.3rem; }
+  article span, .more { color: var(--color-primary-dark); font-size: .84rem; font-weight: 800; }
+  h2 { margin-block: .6rem; font-size: 1.3rem; }
+  p { color: var(--color-text-muted); }
+  @media (min-width: 720px) { .posts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1050px) { .posts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

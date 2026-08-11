@@ -1,0 +1,49 @@
+---
+import JsonLd from "./JsonLd.astro";
+
+interface Props {
+  name: string;
+  description: string;
+  url: string;
+  image?: string;
+  providerName: string;
+  providerUrl: string;
+  areaServed?: string[] | string;
+}
+
+const {
+  name,
+  description,
+  url,
+  image,
+  providerName,
+  providerUrl,
+  areaServed = [],
+} = Astro.props;
+
+const areas = Array.isArray(areaServed) ? areaServed : [areaServed];
+const homeUrl = providerUrl.endsWith("/") ? providerUrl : `${providerUrl}/`;
+---
+
+<JsonLd
+  data={{
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name,
+    description,
+    url,
+    ...(image && { image }),
+    serviceType: name,
+    provider: {
+      "@type": "Organization",
+      "@id": `${homeUrl}#organization`,
+      name: providerName,
+      url: homeUrl,
+    },
+    areaServed: areas.filter(Boolean).map((area) => ({
+      "@type": "City",
+      name: area,
+    })),
+  }}
+/>

@@ -1,0 +1,24 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+interface Props { badge?: string; title: string; description: string; image?: string; imageAlt?: string; buttonText?: string; buttonUrl?: string; features?: string[]; city?: string; }
+const { badge, title, description, image, imageAlt, buttonText, buttonUrl, features = [], city } = Astro.props;
+---
+<section class="section about-section"><div class="container about-grid">
+  {image && <div class="about-media"><SmartImage src={image} alt={imageAlt || title} width={900} height={760} sizes="(min-width: 900px) 45vw, 100vw" role="content" watermark={false} />{city && <div class="about-media__badge">{`خدمة داخل ${city}`}</div>}</div>}
+  <div class="about-content">{badge && <span class="eyebrow">{badge}</span>}<h2>{title}</h2><p>{description}</p>{features.length > 0 && <ul>{features.map((feature) => <li><span aria-hidden="true">✓</span>{feature}</li>)}</ul>}{buttonText && buttonUrl && <a href={buttonUrl}>{buttonText}<span aria-hidden="true">←</span></a>}</div>
+</div></section>
+<style>
+  .about-section { background: var(--color-surface); }
+  .about-grid { display: grid; gap: 2.5rem; align-items: center; }
+  .about-media { position: relative; overflow: hidden; border: 1px solid var(--color-border); border-radius: 2rem; background: white; box-shadow: var(--shadow-md); }
+  .about-media :global(img) { width: 100%; aspect-ratio: 6 / 5; object-fit: cover; }
+  .about-media__badge { position: absolute; right: 1rem; bottom: 1rem; padding: .75rem 1rem; border-radius: var(--radius-md); background: rgb(255 255 255 / 92%); color: var(--color-primary-dark); font-weight: 900; box-shadow: var(--shadow-sm); }
+  .eyebrow { color: var(--color-primary-dark); font-weight: 800; }
+  .about-content h2 { margin-block: .55rem 1rem; font-size: clamp(2rem, 5vw, 3.4rem); }
+  .about-content > p { color: var(--color-text-muted); font-size: 1.04rem; }
+  .about-content ul { display: grid; gap: .7rem; margin-block: 1.4rem; padding: 0; list-style: none; }
+  .about-content li { display: flex; gap: .6rem; font-weight: 700; }
+  .about-content li span { display: grid; width: 1.55rem; height: 1.55rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary-dark); }
+  .about-content > a { display: inline-flex; min-height: 49px; align-items: center; gap: .55rem; padding-inline: 1.2rem; border-radius: var(--radius-md); background: var(--color-primary); color: white; font-weight: 800; }
+  @media (min-width: 900px) { .about-grid { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(3rem, 6vw, 6rem); } }
+</style>

@@ -1,0 +1,53 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+interface ServiceItem {
+  id: string;
+  data: {
+    title: string;
+    description: string;
+    shortDescription?: string;
+    image?: string;
+    imageAlt?: string;
+    features: string[];
+  };
+}
+interface Props { services: ServiceItem[]; }
+const { services } = Astro.props;
+---
+
+{services.length > 0 && <section class="section featured-services">
+  <div class="container">
+    <header class="section-header"><div><span>خدماتنا</span><h2>حلول متكاملة للدهانات والديكورات والتشطيبات</h2><p>اختر الخدمة المناسبة واطلع على تفاصيل التجهيز والتنفيذ والخامات المقترحة لكل مساحة.</p></div><a href="/services/">عرض جميع الخدمات <span aria-hidden="true">←</span></a></header>
+    <div class="services-grid">
+      {services.map((service, index) => <article class="service-card">
+        {service.data.image && <a class="service-card__media" href={`/services/${service.id}/`}><SmartImage src={service.data.image} alt={service.data.imageAlt || service.data.title} width={800} height={520} sizes="(min-width: 1050px) 33vw, (min-width: 720px) 50vw, 100vw" role="card" /></a>}
+        <div class="service-card__content"><span class="number">{String(index + 1).padStart(2, "0")}</span><h3><a href={`/services/${service.id}/`}>{service.data.title}</a></h3><p>{service.data.shortDescription || service.data.description}</p>{service.data.features.length > 0 && <ul>{service.data.features.slice(0, 3).map((feature) => <li><span aria-hidden="true">✓</span>{feature}</li>)}</ul>}<a class="more" href={`/services/${service.id}/`}>تفاصيل الخدمة <span aria-hidden="true">←</span></a></div>
+      </article>)}
+    </div>
+  </div>
+</section>}
+
+<style>
+  .featured-services { background: white; }
+  .section-header { display: grid; gap: 1.2rem; align-items: end; margin-bottom: 2.2rem; }
+  .section-header > div { max-width: 760px; }
+  .section-header span, .more { color: var(--color-primary-dark); font-weight: 800; }
+  .section-header h2 { margin-block: .5rem .75rem; font-size: clamp(2rem, 5vw, 3.4rem); }
+  .section-header p { margin: 0; color: var(--color-text-muted); }
+  .section-header > a { width: fit-content; color: var(--color-primary-dark); font-weight: 800; }
+  .services-grid { display: grid; gap: 1.2rem; }
+  .service-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); transition: transform var(--transition), box-shadow var(--transition); }
+  .service-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .service-card__media { display: block; overflow: hidden; aspect-ratio: 16 / 10; background: #e9e5de; }
+  .service-card__media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease; }
+  .service-card:hover :global(img) { transform: scale(1.035); }
+  .service-card__content { position: relative; padding: 1.35rem; }
+  .number { position: absolute; top: 1.1rem; left: 1.1rem; color: color-mix(in srgb, var(--color-primary) 50%, transparent); font-size: .82rem; font-weight: 900; }
+  .service-card h3 { margin-bottom: .65rem; padding-inline-end: 2rem; font-size: 1.3rem; }
+  .service-card p { color: var(--color-text-muted); }
+  .service-card ul { display: grid; gap: .35rem; margin-block: 1rem; padding: 0; list-style: none; font-size: .9rem; }
+  .service-card li { display: flex; gap: .5rem; }
+  .service-card li span { color: var(--color-primary); }
+  @media (min-width: 720px) { .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1050px) { .services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .section-header { grid-template-columns: 1fr auto; } }
+</style>

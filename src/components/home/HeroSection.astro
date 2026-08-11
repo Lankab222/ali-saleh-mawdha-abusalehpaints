@@ -1,0 +1,357 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+
+interface Props {
+  badge?: string;
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  primaryButtonText: string;
+  primaryButtonUrl: string;
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
+  points?: string[];
+}
+
+const {
+  badge,
+  title,
+  description,
+  image,
+  imageAlt,
+  primaryButtonText,
+  primaryButtonUrl,
+  secondaryButtonText,
+  secondaryButtonUrl,
+  points = [],
+} = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  {
+    image && (
+      <SmartImage
+        class="hero__background"
+        src={image}
+        alt={imageAlt?.trim() || title}
+        width={1600}
+        height={900}
+        sizes="100vw"
+        role="hero"
+        watermark={false}
+        priority
+      />
+    )
+  }
+
+  <div class="hero__overlay" aria-hidden="true"></div>
+
+  <div class="container hero__inner">
+    <div class="hero__content">
+      {
+        badge && (
+          <span class="hero__badge">
+            <span aria-hidden="true" />
+            {badge}
+          </span>
+        )
+      }
+
+      <h1 id="hero-title">{title}</h1>
+      <p>{description}</p>
+
+      <div class="hero__actions">
+        <a class="button button--primary" href={primaryButtonUrl}>
+          {primaryButtonText}
+          <span aria-hidden="true">←</span>
+        </a>
+
+        {
+          secondaryButtonText && secondaryButtonUrl && (
+            <a class="button button--secondary" href={secondaryButtonUrl}>
+              {secondaryButtonText}
+            </a>
+          )
+        }
+      </div>
+
+      {points.length > 0 && (
+        <ul class="hero__points" aria-label="مميزات الخدمة">
+          {points.map((point) => <li>{point}</li>)}
+        </ul>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    font-family: var(--font-family);
+    isolation: isolate;
+    display: grid;
+    min-height: clamp(590px, 76svh, 720px);
+    overflow: hidden;
+    background: #182028;
+    color: #fff;
+  }
+
+  .hero :global(.hero__background) {
+    position: absolute;
+    z-index: -3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.015);
+  }
+
+  .hero__overlay {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(12 18 24 / 42%) 0%,
+        rgb(12 18 24 / 58%) 42%,
+        rgb(12 18 24 / 82%) 100%
+      ),
+      linear-gradient(180deg, rgb(0 0 0 / 10%), rgb(0 0 0 / 32%));
+  }
+
+  .hero::after {
+    position: absolute;
+    z-index: -1;
+    inset-inline-end: -8rem;
+    bottom: -12rem;
+    width: 24rem;
+    height: 24rem;
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 3%);
+    content: "";
+  }
+
+  .hero__inner {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-block: clamp(4rem, 7vw, 6rem);
+  }
+
+  .hero__content {
+    width: min(100%, 720px);
+    margin: 0;
+    padding: clamp(1rem, 2vw, 1.5rem) 0;
+    text-align: start;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1.1rem;
+    padding: 0.48rem 0.9rem;
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: 999px;
+    background: rgb(15 23 31 / 36%);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero__badge > span {
+    width: 0.58rem;
+    height: 0.58rem;
+    border-radius: 50%;
+    background: #d4aa57;
+    box-shadow: 0 0 0 0.27rem rgb(212 170 87 / 20%);
+  }
+
+  .hero h1 {
+    max-width: 760px;
+    margin: 0 0 1rem;
+    color: #fff;
+    font-family: var(--font-family);
+    font-size: clamp(3rem, 4.7vw, 4.65rem);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    text-shadow: 0 5px 28px rgb(0 0 0 / 38%);
+  }
+
+  .hero__content > p {
+    max-width: 620px;
+    margin: 0 0 1.45rem;
+    color: rgb(255 255 255 / 90%);
+    font-size: clamp(1rem, 1.35vw, 1.18rem);
+    line-height: 1.85;
+    text-shadow: 0 2px 12px rgb(0 0 0 / 32%);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .button {
+    display: inline-flex;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding-inline: 1.35rem;
+    border-radius: var(--radius-md);
+    font-weight: 850;
+    transition:
+      transform var(--transition),
+      background-color var(--transition),
+      border-color var(--transition);
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .button--primary {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 14px 32px rgb(0 0 0 / 22%);
+  }
+
+  .button--secondary {
+    border: 1px solid rgb(255 255 255 / 45%);
+    background: rgb(255 255 255 / 12%);
+    color: #fff;
+    backdrop-filter: blur(10px);
+  }
+
+  .button--secondary:hover {
+    border-color: rgb(255 255 255 / 75%);
+    background: rgb(255 255 255 / 20%);
+  }
+
+  .hero__points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 1.2rem 0 0;
+    padding: 0;
+    color: rgb(255 255 255 / 82%);
+    font-size: 0.9rem;
+    font-weight: 750;
+    list-style: none;
+  }
+
+  .hero__points li::before {
+    margin-inline-end: 0.4rem;
+    color: #f0c978;
+    content: "✓";
+  }
+
+  @media (min-width: 761px) and (max-width: 1100px) {
+    .hero {
+      min-height: 620px;
+    }
+
+    .hero__inner {
+      padding-block: 4.5rem;
+    }
+
+    .hero__content {
+      width: min(100%, 650px);
+    }
+
+    .hero h1 {
+      max-width: 650px;
+      font-size: clamp(3rem, 5.8vw, 4rem);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .hero {
+      min-height: calc(100svh - 72px);
+    }
+
+    .hero :global(.hero__background) {
+      object-position: 44% center;
+      transform: scale(1.02);
+    }
+
+    .hero__overlay {
+      background:
+        linear-gradient(180deg, rgb(10 15 20 / 46%), rgb(10 15 20 / 72%)),
+        rgb(10 15 20 / 18%);
+    }
+
+    .hero__inner {
+      justify-content: center;
+      padding-block: clamp(4.5rem, 15vw, 7rem);
+    }
+
+    .hero__content {
+      width: min(100%, 620px);
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    .hero h1 {
+      max-width: 11ch;
+      margin-inline: auto;
+      font-size: clamp(2.45rem, 11.5vw, 4.1rem);
+      line-height: 1.16;
+      letter-spacing: -0.025em;
+    }
+
+    .hero__content > p {
+      max-width: 38rem;
+      margin-inline: auto;
+      font-size: clamp(1rem, 4.4vw, 1.12rem);
+      line-height: 1.85;
+    }
+
+    .hero__actions,
+    .hero__points {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .hero {
+      min-height: calc(100svh - 64px);
+    }
+
+    .hero__inner {
+      padding-block: 4.25rem 5.25rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.25rem, 11.7vw, 3.35rem);
+    }
+
+    .hero__actions {
+      width: 100%;
+    }
+
+    .hero__actions .button {
+      width: 100%;
+    }
+
+    .hero__points {
+      display: grid;
+      gap: 0.4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero :global(.hero__background) {
+      transform: none;
+    }
+  }
+</style>

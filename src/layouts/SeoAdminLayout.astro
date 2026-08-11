@@ -1,0 +1,32 @@
+---
+import "../styles/global.css";
+import "../styles/seo-admin.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "لوحة إدارة السيو",
+  description = "لوحة داخلية لمراجعة تهيئة محركات البحث والفهرسة والأداء.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#8a6a32" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="seo-admin-body">
+    <a class="skip-link" href="#seo-admin-main">الانتقال إلى لوحة السيو</a>
+    <slot />
+  </body>
+</html>

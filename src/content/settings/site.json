@@ -1,0 +1,106 @@
+{
+  "siteName": "ابو صالح للدهانات والديكورات",
+  "siteTitle": "ابو صالح للدهانات والديكورات | معلم دهانات 0549856142",
+  "description": "ابو صالح للدهانات والديكورات والترميمات والمظلات والسواتر افضل مقاول ومعلم دهانات في الرياض .",
+  "siteUrl": "https://paintsriyadh.site",
+  "city": "الرياض",
+  "region": "الرياض",
+  "country": "SA",
+  "serviceAreas": [
+    "الرياض"
+  ],
+  "services": [
+    "دهانات داخلية",
+    "دهانات خارجية",
+    "ديكورات داخلية وخارجية",
+    "ورق جدران",
+    "ترميمات",
+    "جبسات وجبس بورد",
+    "إيبوكسيات",
+    "عوازل الأسطح",
+    "مظلات وسواتر وبرجولات"
+  ],
+  "openingHours": "يوميًا حسب مواعيد العمل",
+  "priceRange": "حسب نطاق العمل",
+  "logo": "/uploads/logo.webp",
+  "defaultImage": "/uploads/og-default.jpg",
+  "heroBadge": "تنفيذ في الرياض",
+  "heroTitle": "ابو صالح للدهانات والديكورات بتشطيبات متقنة وحلول متكاملة",
+  "heroDescription": "ننفذ الدهانات الداخلية والخارجية والديكورات وورق الجدران والجبسات والترميمات والإيبوكسي والعوازل والمظلات والسواتر والبرجولات للمنازل والفلل والمنشآت في الرياض.",
+  "heroImage": "/uploads/hero.webp",
+  "heroImageAlt": "تنفيذ ديكورات ودهانات للمنازل والفلل في الرياض",
+  "heroPrimaryButtonText": "تواصل عبر واتساب",
+  "heroPrimaryButtonUrl": "https://wa.me/966549856142",
+  "heroSecondaryButtonText": "اتصل الآن",
+  "heroSecondaryButtonUrl": "tel:+966549856142",
+  "aboutBadge": "من نحن",
+  "aboutTitle": "تنفيذ منظم يبدأ بتجهيز الأسطح وينتهي بتشطيب يليق بمكانك",
+  "aboutDescription": "نقدم في ابو صالح للدهانات والديكورات حلولًا متكاملة للدهانات والديكورات والتشطيبات. نعاين الموقع، ونحدد حالة الأسطح، ونقترح الخامات والألوان المناسبة، ثم ننفذ العمل بعناية مع المحافظة على نظافة المكان والالتزام بالتفاصيل المتفق عليها.",
+  "aboutImage": "/uploads/about.webp",
+  "aboutImageAlt": "تجهيز وتنفيذ أعمال الدهان والديكور في الرياض",
+  "aboutButtonText": "تعرف على طريقة عملنا",
+  "aboutButtonUrl": "/about/",
+  "aboutFeatures": [
+    "معاينة وفهم واضح لنطاق العمل",
+    "تجهيز دقيق للجدران والأسطح",
+    "خامات مناسبة لطبيعة كل مساحة",
+    "اهتمام بالنظافة والتفاصيل",
+    "تنفيذ خدمات متعددة ضمن مشروع واحد"
+  ],
+  "ctaTitle": "هل لديك مشروع دهانات أو ديكور في الرياض؟",
+  "ctaDescription": "أرسل تفاصيل الموقع والخدمة المطلوبة عبر واتساب أو اتصل بنا لتنسيق المعاينة ومناقشة الخيارات المناسبة.",
+  "ctaButtonText": "اطلب المعاينة",
+  "ctaButtonUrl": "https://wa.me/966549856142",
+  "phone": "+966549856142",
+  "phoneDisplay": "0549856142",
+  "whatsapp": "966549856142",
+  "email": "info@paintsriyadh.site",
+  "address": "الرياض، المملكة العربية السعودية",
+  "facebook": "",
+  "instagram": "",
+  "x": "",
+  "youtube": "",
+  "primaryColor": "#8a6a32",
+  "footerText": "جميع الحقوق محفوظة",
+  "locale": "ar-SA",
+  "heroPoints": [
+    "معاينة وتحديد نطاق العمل",
+    "تنفيذ داخل الرياض",
+    "خدمات متكاملة من جهة واحدة"
+  ],
+  "googleBusinessProfileUrl": "",
+  "developerCredit": {
+    "enabled": true,
+    "name": "محمد الرقابي",
+    "whatsapp": "967730266665"
+  },
+  "imageProcessing": {
+    "enabled": true,
+    "processUnreferenced": false,
+    "widths": [
+      480,
+      768,
+      1200,
+      1600
+    ],
+    "webpQuality": 82,
+    "avifQuality": 58,
+    "warnAboveKb": 500
+  },
+  "watermark": {
+    "enabled": true,
+    "logo": "/uploads/logo.webp",
+    "position": "bottom-right",
+    "opacity": 0.5,
+    "sizePercent": 14,
+    "padding": 24,
+    "applyTo": [
+      "service",
+      "blog",
+      "project",
+      "content",
+      "card"
+    ]
+  },
+  "businessType": "HomeAndConstructionBusiness"
+}

@@ -1,0 +1,161 @@
+:root {
+  --admin-accent: #9b7432;
+  --admin-page: #f4f5f8;
+  --admin-border: #e2e5ea;
+  --admin-text: #202833;
+}
+
+/*
+ * مهم:
+ * لا نغيّر display أو position للعناصر الداخلية في Decap CMS.
+ * أسماء وبنية هذه العناصر تُنشأ ديناميكيًا، والتعديل عليها قد يخفي نموذج التحرير.
+ */
+
+html,
+body {
+  direction: ltr;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--admin-page);
+  color: var(--admin-text);
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"],
+[data-slate-editor="true"] {
+  direction: rtl;
+  max-width: 100%;
+  text-align: right;
+}
+
+label,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+[data-slate-editor="true"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.seo-admin-shortcut {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 99999;
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 14px;
+  border-radius: 10px;
+  background: var(--admin-accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 16%);
+}
+
+.seo-admin-shortcut:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  html,
+  body,
+  #nc-root {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  /*
+   * تحسينات آمنة فقط:
+   * لا نلمس EditorContainer أو ControlPane أو PreviewPane.
+   * إخفاء المعاينة يتم من config.yml عبر editor.preview: false.
+   */
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  [data-slate-editor="true"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-radius: 10px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  input,
+  select,
+  button {
+    min-height: 44px;
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  label {
+    direction: rtl;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  fieldset,
+  form {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  a,
+  p,
+  span,
+  code,
+  small {
+    overflow-wrap: anywhere;
+  }
+
+  .seo-admin-shortcut {
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 12px;
+    min-height: 42px;
+    padding-inline: 12px;
+    border: 1px solid rgb(255 255 255 / 45%);
+    font-size: 13px;
+  }
+}

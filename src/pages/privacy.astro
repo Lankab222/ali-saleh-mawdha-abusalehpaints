@@ -1,0 +1,11 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+---
+<BaseLayout title="سياسة الخصوصية" description={`سياسة الخصوصية لموقع ${settings.siteName}.`} noindex={false}>
+  <main id="main-content"><section class="section"><article class="container legal prose"><h1>سياسة الخصوصية</h1><p>توضح هذه الصفحة كيفية التعامل مع المعلومات التي يرسلها الزائر عند التواصل لطلب خدمة أو استفسار.</p><h2>المعلومات التي قد نستقبلها</h2><p>قد نستقبل الاسم ورقم الهاتف والحي وصور الموقع وتفاصيل الخدمة التي يرسلها العميل طوعًا عبر الهاتف أو واتساب أو البريد.</p><h2>استخدام المعلومات</h2><p>تستخدم المعلومات للرد على الاستفسار وتنسيق المعاينة وتحديد نطاق العمل. لا نبيع بيانات العملاء لأطراف أخرى.</p><h2>الروابط والخدمات الخارجية</h2><p>قد يحتوي الموقع على روابط لواتساب أو منصات اجتماعية، وتخضع هذه الخدمات لسياساتها الخاصة.</p><h2>التحديثات</h2><p>قد تُحدّث هذه السياسة عند إضافة نماذج أو أدوات قياس جديدة إلى الموقع.</p></article></section></main>
+</BaseLayout>
+<style>.legal { max-width: 850px; }.legal h1 { font-size: clamp(2.2rem, 7vw, 4rem); }</style>

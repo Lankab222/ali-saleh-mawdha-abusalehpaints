@@ -1,0 +1,50 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroSection from "../components/home/HeroSection.astro";
+import FeaturedServices from "../components/home/FeaturedServices.astro";
+import AboutSection from "../components/home/AboutSection.astro";
+import FeaturedProjects from "../components/home/FeaturedProjects.astro";
+import LatestPosts from "../components/home/LatestPosts.astro";
+import TestimonialsSection from "../components/home/TestimonialsSection.astro";
+import FaqSection from "../components/home/FaqSection.astro";
+import ContactCta from "../components/home/ContactCta.astro";
+import FaqSchema from "../components/schema/FaqSchema.astro";
+
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+
+const services = (await getCollection("services", ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order)
+  .filter((service) => service.data.featured)
+  .slice(0, 6);
+const projects = (await getCollection("projects", ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order)
+  .filter((project) => project.data.featured)
+  .slice(0, 3);
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime())
+  .slice(0, 3);
+const faqEntries = (await getCollection("faq", ({ data }) => data.published))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 8);
+const testimonials = (await getCollection("testimonials", ({ data }) => data.published))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((item) => item.data);
+const faqItems = faqEntries.map((item) => ({ question: item.data.question, answer: item.data.answer }));
+---
+
+<BaseLayout title={settings.siteTitle} description={settings.description} image={settings.heroImage || settings.defaultImage} imageAlt={settings.heroImageAlt}>
+  <Fragment slot="head"><FaqSchema items={faqItems} /></Fragment>
+  <main id="main-content">
+    <HeroSection badge={settings.heroBadge} title={settings.heroTitle} description={settings.heroDescription} image={settings.heroImage} imageAlt={settings.heroImageAlt} primaryButtonText={settings.heroPrimaryButtonText} primaryButtonUrl={settings.heroPrimaryButtonUrl} secondaryButtonText={settings.heroSecondaryButtonText} secondaryButtonUrl={settings.heroSecondaryButtonUrl} points={settings.heroPoints} />
+    <FeaturedServices services={services} />
+    <AboutSection badge={settings.aboutBadge} title={settings.aboutTitle} description={settings.aboutDescription} image={settings.aboutImage} imageAlt={settings.aboutImageAlt} buttonText={settings.aboutButtonText} buttonUrl={settings.aboutButtonUrl} features={settings.aboutFeatures} city={settings.city} />
+    <FeaturedProjects projects={projects} />
+    <LatestPosts posts={posts} locale={settings.locale} />
+    <TestimonialsSection items={testimonials} />
+    <FaqSection items={faqItems} />
+    <ContactCta title={settings.ctaTitle} description={settings.ctaDescription} buttonText={settings.ctaButtonText} buttonUrl={settings.ctaButtonUrl} phone={settings.phone} whatsapp={settings.whatsapp} />
+  </main>
+</BaseLayout>

@@ -1,0 +1,63 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, getEntry, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleSchema from "../../components/schema/ArticleSchema.astro";
+import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
+import FaqSchema from "../../components/schema/FaqSchema.astro";
+import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
+import ShareButtons from "../../components/blog/ShareButtons.astro";
+import RelatedPosts from "../../components/blog/RelatedPosts.astro";
+import PostContactButtons from "../../components/blog/PostContactButtons.astro";
+import SmartImage from "../../components/common/SmartImage.astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+const baseUrl = Astro.site?.toString() ?? settings.siteUrl;
+const articleUrl = new URL(`/blog/${post.id}/`, baseUrl).toString();
+const canonicalUrl = post.data.canonical
+  ? new URL(post.data.canonical, baseUrl).toString()
+  : articleUrl;
+const articleImage = new URL(post.data.image || settings.defaultImage, baseUrl).toString();
+const logoUrl = new URL(settings.logo || "/favicon.svg", baseUrl).toString();
+const relatedPosts = (await getCollection("blog", ({ data }) => !data.draft))
+  .filter((item) => item.id !== post.id && (item.data.category === post.data.category || item.data.tags.some((tag) => post.data.tags.includes(tag))))
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime())
+  .slice(0, 3);
+const pageTitle = post.data.seoTitle || post.data.title;
+const pageDescription = post.data.seoDescription || post.data.description;
+---
+<BaseLayout title={pageTitle} description={pageDescription} canonical={canonicalUrl} noindex={post.data.noindex} image={post.data.ogImage || post.data.image || settings.defaultImage} imageAlt={post.data.imageAlt || post.data.title} type="article" publishedTime={post.data.publishDate} modifiedTime={post.data.updatedDate || post.data.publishDate} author={post.data.author} section={post.data.category}>
+  <Fragment slot="head">
+    <ArticleSchema title={post.data.title} description={pageDescription} url={canonicalUrl} image={articleImage} publishedTime={post.data.publishDate} modifiedTime={post.data.updatedDate || post.data.publishDate} author={post.data.author} siteName={settings.siteName} siteUrl={baseUrl} logo={logoUrl} locale={settings.locale} />
+    <BreadcrumbSchema items={[{ name: "الرئيسية", url: new URL("/", baseUrl).toString() }, { name: "المقالات", url: new URL("/blog/", baseUrl).toString() }, { name: post.data.title, url: articleUrl }]} />
+    <FaqSchema items={post.data.faq} />
+  </Fragment>
+  <main id="main-content">
+    <Breadcrumbs items={[{ label: "الرئيسية", href: "/" }, { label: "المقالات", href: "/blog/" }, { label: post.data.title }]} />
+    <section class="section"><article class="article container"><header><a class="category" href={`/blog/category/${encodeURIComponent(post.data.category)}/`}>{post.data.category}</a><h1>{post.data.title}</h1><p>{post.data.description}</p><div class="meta"><time datetime={post.data.publishDate.toISOString()}>{post.data.publishDate.toLocaleDateString(settings.locale, { year: "numeric", month: "long", day: "numeric" })}</time><span>{post.data.author}</span></div></header>{post.data.image && <figure class="article-image"><SmartImage src={post.data.image} alt={post.data.imageAlt || post.data.title} width={1200} height={675} sizes="(min-width: 1000px) 1000px, 100vw" role="blog" priority /></figure>}<div class="prose"><Content /></div>{post.data.faq.length > 0 && <section class="faq"><h2>أسئلة شائعة</h2>{post.data.faq.map((item) => <details><summary>{item.question}</summary><p>{item.answer}</p></details>)}</section>}<PostContactButtons phone={settings.phone} phoneDisplay={settings.phoneDisplay} whatsapp={settings.whatsapp} title={`هل تحتاج إلى تنفيذ خدمة في ${settings.city}؟`} whatsappMessage={`مرحبًا، قرأت مقال ${post.data.title} وأريد الاستفسار عن الخدمة`} /><ShareButtons title={post.data.title} url={articleUrl} /><RelatedPosts posts={relatedPosts} /></article></section>
+  </main>
+</BaseLayout>
+<style>
+  .article { max-width: 1000px; }
+  header { max-width: 820px; margin-inline: auto; text-align: center; }
+  .category { color: var(--color-primary-dark); font-weight: 800; }
+  h1 { margin-block: .7rem 1rem; font-size: clamp(2.2rem, 7vw, 4.5rem); text-wrap: balance; }
+  header > p { color: var(--color-text-muted); font-size: 1.08rem; }
+  .meta { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem 1.2rem; color: var(--color-text-muted); font-size: .85rem; }
+  .article-image { overflow: hidden; margin-block: 2.3rem; border: 1px solid var(--color-border); border-radius: 2rem; background: var(--color-surface); box-shadow: var(--shadow-md); }
+  .article-image :global(img) { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .prose { margin-inline: auto; }
+  .faq { max-width: 76ch; margin: 3rem auto 0; }
+  .faq details { margin-bottom: .65rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+  .faq summary { cursor: pointer; padding: 1rem; font-weight: 800; }
+  .faq p { margin: 0; padding: 0 1rem 1rem; color: var(--color-text-muted); }
+</style>

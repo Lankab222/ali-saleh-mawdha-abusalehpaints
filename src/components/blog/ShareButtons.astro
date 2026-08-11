@@ -1,0 +1,35 @@
+---
+interface Props { title: string; url: string; }
+const { title, url } = Astro.props;
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(url);
+const links = [
+  { label: "واتساب", href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}` },
+  { label: "فيسبوك", href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}` },
+  { label: "منصة X", href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}` },
+];
+---
+<div class="share-box"><strong>شارك المقال</strong><div>{links.map((item) => <a href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>)}<button type="button" data-copy-url={url}>نسخ الرابط</button></div></div>
+<script>
+  function initCopyButtons() {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy-url]").forEach((button) => {
+      if (button.dataset.initialized === "true") return;
+      button.dataset.initialized = "true";
+      button.addEventListener("click", async () => {
+        const url = button.dataset.copyUrl;
+        if (!url) return;
+        try { await navigator.clipboard.writeText(url); button.textContent = "تم النسخ"; }
+        catch { button.textContent = "تعذر النسخ"; }
+        window.setTimeout(() => { button.textContent = "نسخ الرابط"; }, 1800);
+      });
+    });
+  }
+  initCopyButtons();
+  document.addEventListener("astro:page-load", initCopyButtons);
+</script>
+<style>
+  .share-box { display: grid; gap: .8rem; margin-block: 2.5rem; padding: 1.15rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .share-box > div { display: flex; flex-wrap: wrap; gap: .55rem; }
+  a, button { display: inline-flex; min-height: 42px; align-items: center; padding-inline: .85rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: white; color: var(--color-text); font-weight: 750; }
+  a:hover, button:hover { border-color: var(--color-primary); color: var(--color-primary-dark); }
+</style>

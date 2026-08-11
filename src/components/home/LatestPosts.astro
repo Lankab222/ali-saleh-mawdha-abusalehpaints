@@ -1,0 +1,29 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+interface PostItem { id: string; data: { title: string; description: string; publishDate: Date; image?: string; imageAlt?: string; category: string; author: string; }; }
+interface Props { posts: PostItem[]; locale?: string; }
+const { posts, locale = "ar-SA" } = Astro.props;
+const formatDate = (date: Date) => date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+---
+{posts.length > 0 && <section class="section latest-posts"><div class="container"><header><div><span>دليل الدهانات والديكور</span><h2>مقالات تساعدك على اختيار الخامات والتشطيبات المناسبة</h2></div><a href="/blog/">جميع المقالات <span aria-hidden="true">←</span></a></header><div class="posts-grid">{posts.map((post) => <article>{post.data.image && <a class="media" href={`/blog/${post.id}/`}><SmartImage src={post.data.image} alt={post.data.imageAlt || post.data.title} width={800} height={500} sizes="(min-width: 1050px) 33vw, (min-width: 720px) 50vw, 100vw" role="blog" /></a>}<div class="body"><div class="meta"><span>{post.data.category}</span><time datetime={post.data.publishDate.toISOString()}>{formatDate(post.data.publishDate)}</time></div><h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3><p>{post.data.description}</p><a class="more" href={`/blog/${post.id}/`}>قراءة المقال <span aria-hidden="true">←</span></a></div></article>)}</div></div></section>}
+<style>
+  .latest-posts { background: var(--color-surface); }
+  header { display: grid; gap: 1rem; margin-bottom: 2rem; }
+  header > div { max-width: 790px; }
+  header span, header > a, .more { color: var(--color-primary-dark); font-weight: 800; }
+  header h2 { margin-block: .5rem 0; font-size: clamp(2rem, 5vw, 3.35rem); }
+  header > a { width: fit-content; }
+  .posts-grid { display: grid; gap: 1.2rem; }
+  article { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: white; transition: transform var(--transition), box-shadow var(--transition); }
+  article:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .media { display: block; overflow: hidden; aspect-ratio: 16 / 10; }
+  .media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease; }
+  article:hover :global(img) { transform: scale(1.035); }
+  .body { padding: 1.3rem; }
+  .meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; color: var(--color-text-muted); font-size: .8rem; }
+  .meta span { color: var(--color-primary-dark); font-weight: 800; }
+  h3 { margin-block: .7rem; font-size: 1.25rem; }
+  .body > p { color: var(--color-text-muted); }
+  @media (min-width: 720px) { .posts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1050px) { .posts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } header { grid-template-columns: 1fr auto; align-items: end; } }
+</style>

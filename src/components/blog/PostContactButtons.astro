@@ -1,0 +1,21 @@
+---
+import { getEntry } from "astro:content";
+interface Props { phone?: string; phoneDisplay?: string; whatsapp?: string; title?: string; whatsappMessage?: string; city?: string; }
+const { phone, phoneDisplay, whatsapp, title = "هل تحتاج إلى تنفيذ هذه الخدمة؟", whatsappMessage = "مرحبًا، أريد الاستفسار عن خدماتكم", city } = Astro.props;
+const settingsEntry = await getEntry("settings", "site");
+const serviceCity = city || settingsEntry?.data.city || "";
+const message = encodeURIComponent(whatsappMessage);
+---
+{(phone || whatsapp) && <aside class="contact-box" aria-label="طلب الخدمة"><div><span>تواصل مباشر</span><h2>{title}</h2><p>{serviceCity ? `أرسل تفاصيل العمل أو اتصل لتنسيق المعاينة داخل ${serviceCity}.` : "أرسل تفاصيل العمل أو اتصل لتنسيق المعاينة."}</p></div><div class="actions">{whatsapp && <a class="whatsapp" href={`https://wa.me/${whatsapp}?text=${message}`} target="_blank" rel="noopener noreferrer">واتساب</a>}{phone && <a class="phone" href={`tel:${phone}`}>اتصال {phoneDisplay && <span>{phoneDisplay}</span>}</a>}</div></aside>}
+<style>
+  .contact-box { display: grid; gap: 1.2rem; margin-block: 2.5rem; padding: clamp(1.4rem, 4vw, 2rem); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)); color: white; }
+  .contact-box > div > span { font-weight: 800; opacity: .8; }
+  .contact-box h2 { margin-block: .35rem .5rem; font-size: clamp(1.5rem, 4vw, 2.2rem); }
+  .contact-box p { margin: 0; color: rgb(255 255 255 / 82%); }
+  .actions { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; }
+  .actions a { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: .4rem; padding-inline: 1rem; border-radius: var(--radius-md); font-weight: 850; }
+  .whatsapp { background: white; color: var(--color-primary-dark); }
+  .phone { border: 1px solid rgb(255 255 255 / 40%); background: rgb(255 255 255 / 10%); color: white; }
+  .phone span { direction: ltr; }
+  @media (min-width: 760px) { .contact-box { grid-template-columns: 1fr auto; align-items: center; } }
+</style>

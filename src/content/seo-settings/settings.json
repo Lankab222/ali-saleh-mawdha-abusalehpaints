@@ -1,0 +1,28 @@
+{
+  "bingSiteVerification": "",
+  "searchConsoleProperty": "sc-domain:paintsriyadh.site",
+  "robots": {
+    "allowAll": true,
+    "disallow": [
+      "/admin/",
+      "/seo-admin/",
+      "/seo-api/"
+    ]
+  },
+  "titleTemplate": "%s | ابو صالح للدهانات والديكورات",
+  "noindexCategoryPages": true,
+  "defaultImage": "/uploads/og-default.jpg",
+  "defaultDescription": "ابو صالح للدهانات والديكورات والترميمات والمظلات والسواتر افضل مقاول ومعلم دهانات في الرياض .",
+  "noindexTagPages": true,
+  "googleSiteVerification": "",
+  "audit": {
+    "minimumTitleLength": 30,
+    "maximumTitleLength": 65,
+    "minimumDescriptionLength": 80,
+    "maximumDescriptionLength": 165,
+    "minimumContentCharacters": 700,
+    "reviewScore": 80,
+    "targetPerformanceScore": 90
+  },
+  "googleBusinessProfileUrl": ""
+}

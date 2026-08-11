@@ -1,0 +1,86 @@
+---
+import manifestJson from "../../generated/image-manifest.json";
+import { getEntry } from "astro:content";
+
+type Role = "hero" | "service" | "blog" | "project" | "content" | "card" | "logo" | "social";
+type Variant = { src: string; width: number; height: number; type: string; bytes?: number };
+type ManifestEntry = {
+  src: string;
+  originalBytes: number;
+  originalWidth: number;
+  originalHeight: number;
+  originalFormat?: string;
+  oversized?: boolean;
+  plain: Variant[];
+  watermarked: Variant[];
+};
+type ImageManifest = {
+  settings?: { watermarkEnabled?: boolean; watermarkApplyTo?: string[] };
+  images: Record<string, ManifestEntry>;
+};
+
+interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  class?: string;
+  role?: Role;
+  watermark?: boolean;
+  priority?: boolean;
+  loading?: "eager" | "lazy";
+  fetchpriority?: "high" | "low" | "auto";
+  decoding?: "sync" | "async" | "auto";
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  sizes = "100vw",
+  class: className,
+  role = "content",
+  watermark,
+  priority = false,
+  loading,
+  fetchpriority,
+  decoding = "async",
+} = Astro.props;
+
+const manifest = manifestJson as unknown as ImageManifest;
+const entry = manifest.images?.[src];
+const settingsEntry = await getEntry("settings", "site");
+const applyTo = (settingsEntry?.data.watermark?.applyTo ?? manifest.settings?.watermarkApplyTo ?? []) as string[];
+const watermarkEnabled = settingsEntry?.data.watermark?.enabled ?? manifest.settings?.watermarkEnabled ?? false;
+const shouldWatermark = watermark ?? (watermarkEnabled && applyTo.includes(role));
+const variants = entry ? (shouldWatermark && entry.watermarked?.length ? entry.watermarked : entry.plain) : [];
+const webp = variants.filter((item) => item.type === "image/webp").sort((a, b) => a.width - b.width);
+const avif = variants.filter((item) => item.type === "image/avif").sort((a, b) => a.width - b.width);
+const intrinsicWidth = width ?? entry?.originalWidth;
+const intrinsicHeight = height ?? entry?.originalHeight;
+const imgSrc = src;
+const imgLoading = loading ?? (priority ? "eager" : "lazy");
+const imgFetchPriority = fetchpriority ?? (priority ? "high" : "auto");
+const srcset = (items: Variant[]) => items.map((item) => `${item.src} ${item.width}w`).join(", ");
+---
+
+<picture class:list={["smart-picture", className && `${className}__picture`]}>
+  {avif.length > 0 && <source type="image/avif" srcset={srcset(avif)} sizes={sizes} />}
+  {webp.length > 0 && <source type="image/webp" srcset={srcset(webp)} sizes={sizes} />}
+  <img
+    class={className}
+    src={imgSrc}
+    alt={alt}
+    width={intrinsicWidth}
+    height={intrinsicHeight}
+    loading={imgLoading}
+    fetchpriority={imgFetchPriority}
+    decoding={decoding}
+  />
+</picture>
+
+<style>
+  .smart-picture { display: contents; }
+</style>

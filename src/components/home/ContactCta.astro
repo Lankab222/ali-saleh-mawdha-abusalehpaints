@@ -1,0 +1,19 @@
+---
+interface Props { title: string; description: string; buttonText: string; buttonUrl: string; phone?: string; whatsapp?: string; }
+const { title, description, buttonText, buttonUrl, phone, whatsapp } = Astro.props;
+---
+<section class="section cta-section"><div class="container"><div class="cta-box"><div><span>ابدأ بخطوة واضحة</span><h2>{title}</h2><p>{description}</p></div><div class="actions"><a class="primary" href={buttonUrl}>{buttonText}</a>{whatsapp && <a class="secondary" href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer">واتساب</a>}{phone && <a class="secondary" href={`tel:${phone}`}>اتصال</a>}</div></div></div></section>
+<style>
+  .cta-section { background: white; }
+  .cta-box { position: relative; display: grid; gap: 2rem; overflow: hidden; padding: clamp(2rem, 6vw, 4rem); border-radius: 2rem; background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)); color: white; box-shadow: 0 24px 60px color-mix(in srgb, var(--color-primary) 24%, transparent); }
+  .cta-box::after { position: absolute; left: -6rem; bottom: -8rem; width: 20rem; height: 20rem; border-radius: 50%; background: rgb(255 255 255 / 8%); content: ""; }
+  .cta-box > div { position: relative; z-index: 1; }
+  .cta-box span { font-weight: 800; opacity: .8; }
+  .cta-box h2 { margin-block: .5rem .8rem; font-size: clamp(2rem, 6vw, 3.7rem); }
+  .cta-box p { margin: 0; color: rgb(255 255 255 / 83%); }
+  .actions { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
+  .actions a { display: inline-flex; min-height: 50px; align-items: center; justify-content: center; padding-inline: 1.2rem; border-radius: var(--radius-md); font-weight: 850; }
+  .primary { background: white; color: var(--color-primary-dark); }
+  .secondary { border: 1px solid rgb(255 255 255 / 40%); background: rgb(255 255 255 / 10%); color: white; }
+  @media (min-width: 900px) { .cta-box { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } .actions { justify-content: flex-end; } }
+</style>

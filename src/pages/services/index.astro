@@ -1,0 +1,32 @@
+---
+import SmartImage from "../../components/common/SmartImage.astro";
+import { getCollection, getEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/common/PageHero.astro";
+const services = (await getCollection("services", ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+---
+<BaseLayout title={`خدمات ${settings.siteName} في ${settings.city}`} description={`تعرف على خدمات ${settings.siteName} المتاحة في ${settings.city} ومراحل التنفيذ والتجهيز.`} pageType="CollectionPage">
+  <main id="main-content">
+    <PageHero eyebrow="خدماتنا" title={`خدمات ${settings.siteName} في ${settings.city}`} description="صفحات تفصيلية توضح نطاق كل خدمة ومراحل التنفيذ وأهم نقاط التجهيز قبل بدء العمل." />
+    <section class="section"><div class="container">{services.length > 0 ? <div class="services-grid">{services.map((service) => <article>{service.data.image && <a class="media" href={`/services/${service.id}/`}><SmartImage src={service.data.image} alt={service.data.imageAlt || service.data.title} width={800} height={500} sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 100vw" role="service" /></a>}<div class="body"><h2><a href={`/services/${service.id}/`}>{service.data.title}</a></h2><p>{service.data.shortDescription || service.data.description}</p>{service.data.features.length > 0 && <ul>{service.data.features.slice(0, 4).map((feature) => <li><span aria-hidden="true">✓</span>{feature}</li>)}</ul>}<a class="more" href={`/services/${service.id}/`}>تفاصيل الخدمة ←</a></div></article>)}</div> : <p class="empty-state">لا توجد خدمات منشورة حاليًا.</p>}</div></section>
+  </main>
+</BaseLayout>
+<style>
+  .services-grid { display: grid; gap: 1.2rem; }
+  article { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); transition: transform var(--transition), box-shadow var(--transition); }
+  article:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .media { display: block; overflow: hidden; aspect-ratio: 16 / 10; }
+  .services-grid :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease; }
+  article:hover :global(img) { transform: scale(1.035); }
+  .body { padding: 1.35rem; }
+  h2 { margin-bottom: .65rem; font-size: 1.35rem; }
+  p { color: var(--color-text-muted); }
+  ul { display: grid; gap: .35rem; padding: 0; list-style: none; font-size: .9rem; }
+  li { display: flex; gap: .5rem; }
+  li span, .more { color: var(--color-primary-dark); font-weight: 800; }
+  @media (min-width: 720px) { .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1050px) { .services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

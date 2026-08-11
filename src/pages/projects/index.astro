@@ -1,0 +1,27 @@
+---
+import SmartImage from "../../components/common/SmartImage.astro";
+import { getCollection, getEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/common/PageHero.astro";
+const projects = (await getCollection("projects", ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+---
+<BaseLayout title={`مشاريع ${settings.siteName} في ${settings.city}`} description={`معرض مشاريع وأعمال ${settings.siteName} في ${settings.city} مع صور وتفاصيل الخدمات المنفذة.`} pageType="CollectionPage">
+  <main id="main-content"><PageHero eyebrow="معرض الأعمال" title={`مشاريع ${settings.siteName} في ${settings.city}`} description="نماذج من المشاريع والأعمال المنفذة مع صور وتفاصيل مختصرة." /><section class="section"><div class="container">{projects.length > 0 ? <div class="projects-grid">{projects.map((project) => <article><a href={`/projects/${project.id}/`}>{project.data.coverImage && <SmartImage src={project.data.coverImage} alt={project.data.coverImageAlt || project.data.title} width={900} height={650} sizes="(min-width: 1050px) 33vw, (min-width: 760px) 50vw, 100vw" role="project" />}<div class="overlay"></div><div class="content"><span>{project.data.category}</span><h2>{project.data.title}</h2><p>{project.data.description}</p>{project.data.location && <small>{project.data.location}</small>}</div></a></article>)}</div> : <div class="empty-state"><h2>قسم المشاريع جاهز لإضافة أعمالك</h2><p>أضف صورًا حقيقية ووصفًا مختصرًا لكل مشروع من لوحة إدارة المحتوى، وسيظهر هنا تلقائيًا.</p></div>}</div></section></main>
+</BaseLayout>
+<style>
+  .projects-grid { display: grid; gap: 1rem; }
+  article { position: relative; min-height: 340px; overflow: hidden; border-radius: var(--radius-lg); background: var(--color-secondary); }
+  article > a { position: absolute; inset: 0; }
+  .projects-grid :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 350ms ease; }
+  article:hover :global(img) { transform: scale(1.035); }
+  .overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgb(12 17 22 / 86%), transparent 72%); }
+  .content { position: absolute; right: 0; bottom: 0; left: 0; padding: 1.4rem; color: white; }
+  .content span { font-size: .8rem; font-weight: 800; }
+  h2 { margin-block: .45rem; font-size: 1.4rem; }
+  p { color: rgb(255 255 255 / 82%); }
+  @media (min-width: 720px) { .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1050px) { .projects-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

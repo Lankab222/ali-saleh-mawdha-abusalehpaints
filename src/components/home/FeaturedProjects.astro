@@ -1,0 +1,29 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+interface ProjectItem { id: string; data: { title: string; description: string; category: string; location?: string; coverImage?: string; coverImageAlt?: string; }; }
+interface Props { projects: ProjectItem[]; }
+const { projects } = Astro.props;
+---
+{projects.length > 0 && <section class="section featured-projects"><div class="container"><header><div><span>أعمالنا</span><h2>مشاريع مختارة من أعمال الدهانات والديكور</h2><p>نماذج حقيقية تساعدك على تكوين فكرة أوضح عن التشطيب والخامات والنتيجة النهائية.</p></div><a href="/projects/">جميع المشاريع <span aria-hidden="true">←</span></a></header><div class="projects-grid">{projects.map((project) => <article><a href={`/projects/${project.id}/`}>{project.data.coverImage && <SmartImage src={project.data.coverImage} alt={project.data.coverImageAlt || project.data.title} width={900} height={650} sizes="(min-width: 1050px) 33vw, (min-width: 760px) 50vw, 100vw" role="project" />}<div class="overlay"></div><div class="content"><span>{project.data.category}</span><h3>{project.data.title}</h3><p>{project.data.description}</p>{project.data.location && <small>{project.data.location}</small>}</div></a></article>)}</div></div></section>}
+<style>
+  .featured-projects { background: white; }
+  header { display: grid; gap: 1rem; margin-bottom: 2rem; }
+  header > div { max-width: 760px; }
+  header span, header > a { color: var(--color-primary-dark); font-weight: 800; }
+  header h2 { margin-block: .5rem .7rem; font-size: clamp(2rem, 5vw, 3.35rem); }
+  header p { margin: 0; color: var(--color-text-muted); }
+  header > a { width: fit-content; }
+  .projects-grid { display: grid; gap: 1rem; }
+  article { position: relative; min-height: 330px; overflow: hidden; border-radius: var(--radius-lg); background: var(--color-secondary); }
+  article > a { position: absolute; inset: 0; }
+  .featured-projects :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 350ms ease; }
+  article:hover :global(img) { transform: scale(1.035); }
+  .overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgb(12 17 22 / 84%), rgb(12 17 22 / 6%) 70%); }
+  .content { position: absolute; right: 0; bottom: 0; left: 0; padding: 1.4rem; color: white; }
+  .content span { display: inline-flex; margin-bottom: .55rem; padding: .2rem .55rem; border-radius: 999px; background: rgb(255 255 255 / 15%); font-size: .78rem; font-weight: 800; }
+  .content h3 { margin-bottom: .4rem; font-size: 1.35rem; }
+  .content p { display: -webkit-box; margin-bottom: .35rem; overflow: hidden; color: rgb(255 255 255 / 82%); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .content small { color: rgb(255 255 255 / 72%); }
+  @media (min-width: 760px) { .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } header { grid-template-columns: 1fr auto; align-items: end; } }
+  @media (min-width: 1050px) { .projects-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

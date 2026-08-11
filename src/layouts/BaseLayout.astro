@@ -1,0 +1,166 @@
+---
+import "../styles/global.css";
+import { getEntry, getCollection } from "astro:content";
+import Header from "../components/common/Header.astro";
+import Footer from "../components/common/Footer.astro";
+import FloatingSocials from "../components/common/FloatingSocials.astro";
+import SEO from "../components/seo/SEO.astro";
+import SiteSchema from "../components/schema/SiteSchema.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  noindex?: boolean;
+  publishedTime?: Date | string;
+  modifiedTime?: Date | string;
+  author?: string;
+  section?: string;
+  pageType?: "WebPage" | "AboutPage" | "ContactPage" | "CollectionPage";
+}
+
+const settingsEntry = await getEntry("settings", "site");
+const seoSettingsEntry = await getEntry("seoSettings", "settings");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+if (!seoSettingsEntry) throw new Error("ملف إعدادات السيو غير موجود");
+const settings = settingsEntry.data;
+const seoSettings = seoSettingsEntry.data;
+
+const {
+  title = settings.siteTitle,
+  description = seoSettings.defaultDescription || settings.description,
+  canonical,
+  image = seoSettings.defaultImage || settings.defaultImage,
+  imageAlt,
+  type = "website",
+  noindex = false,
+  publishedTime,
+  modifiedTime,
+  author,
+  section,
+  pageType = "WebPage",
+} = Astro.props;
+
+const fullTitle =
+  title === settings.siteTitle || title.includes(settings.siteName)
+    ? title
+    : seoSettings.titleTemplate.includes("%s")
+      ? seoSettings.titleTemplate.replace("%s", title)
+      : `${title} | ${settings.siteName}`;
+const productionUrl = Astro.site?.toString() ?? settings.siteUrl;
+const footerServices = (await getCollection("services", ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 5)
+  .map((item) => ({ label: item.data.title, href: `/services/${item.id}/` }));
+
+const socialUrls = [settings.facebook, settings.instagram, settings.x, settings.youtube, settings.googleBusinessProfileUrl].filter(
+  (value): value is string => Boolean(value),
+);
+---
+
+<!doctype html>
+<html lang={settings.locale.split("-")[0] || "ar"} dir="rtl" style={`--color-primary: ${settings.primaryColor};`}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={settings.primaryColor} />
+    <meta name="format-detection" content="telephone=yes" />
+    {seoSettings.googleSiteVerification && (
+      <meta name="google-site-verification" content={seoSettings.googleSiteVerification} />
+    )}
+    {seoSettings.bingSiteVerification && (
+      <meta name="msvalidate.01" content={seoSettings.bingSiteVerification} />
+    )}
+
+    <SEO
+      title={fullTitle}
+      siteName={settings.siteName}
+      siteUrl={productionUrl}
+      description={description}
+      canonical={canonical}
+      image={image}
+      imageAlt={imageAlt}
+      type={type}
+      locale={settings.locale}
+      noindex={noindex}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+      section={section}
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`مقالات ${settings.siteName}`}
+      href={new URL("/rss.xml", productionUrl).toString()}
+    />
+
+    <SiteSchema
+      siteName={settings.siteName}
+      siteUrl={productionUrl}
+      siteDescription={settings.description}
+      locale={settings.locale}
+      country={settings.country}
+      businessType={settings.businessType}
+      title={fullTitle}
+      description={description}
+      canonicalUrl={canonical}
+      logo={settings.logo}
+      businessImage={settings.heroImage || settings.defaultImage}
+      pageImage={image}
+      phone={settings.phone}
+      email={settings.email}
+      priceRange={settings.priceRange}
+      address={{
+        addressLocality: settings.city,
+        addressRegion: settings.region,
+        addressCountry: settings.country,
+      }}
+      areaServed={settings.serviceAreas}
+      services={settings.services}
+      sameAs={socialUrls}
+      pageType={pageType}
+    />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main-content">الانتقال إلى المحتوى</a>
+    <Header siteName={settings.siteName} logo={settings.logo} phone={settings.phone} />
+
+    <slot />
+
+    <Footer
+      siteName={settings.siteName}
+      footerText={settings.footerText}
+      description={settings.description}
+      logo={settings.logo}
+      phone={settings.phone}
+      phoneDisplay={settings.phoneDisplay}
+      whatsapp={settings.whatsapp}
+      email={settings.email}
+      address={settings.address}
+      facebook={settings.facebook}
+      instagram={settings.instagram}
+      x={settings.x}
+      youtube={settings.youtube}
+      services={footerServices}
+      developerCredit={settings.developerCredit}
+    />
+
+    <FloatingSocials
+      phone={settings.phone}
+      phoneDisplay={settings.phoneDisplay}
+      whatsapp={settings.whatsapp}
+      email={settings.email}
+      instagram={settings.instagram}
+      whatsappMessage={`مرحبًا، أريد الاستفسار عن خدمات ${settings.siteName} في ${settings.city}`}
+    />
+  </body>
+</html>

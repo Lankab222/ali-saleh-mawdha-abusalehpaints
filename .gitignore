@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+client.config.json
+public/generated/images/
+.DS_Store
+src/generated/image-manifest.json

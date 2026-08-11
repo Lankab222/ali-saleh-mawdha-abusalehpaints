@@ -1,0 +1,60 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, getEntry, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
+import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
+import RelatedProjects from "../../components/projects/RelatedProjects.astro";
+import ProjectNavigation from "../../components/projects/ProjectNavigation.astro";
+import PostContactButtons from "../../components/blog/PostContactButtons.astro";
+import SmartImage from "../../components/common/SmartImage.astro";
+
+export const getStaticPaths = (async () => {
+  const projects = await getCollection("projects", ({ data }) => !data.draft);
+  return projects.map((project) => ({ params: { id: project.id }, props: { project } }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+const baseUrl = Astro.site?.toString() ?? settings.siteUrl;
+const projectUrl = new URL(`/projects/${project.id}/`, baseUrl).toString();
+const canonicalUrl = project.data.canonical
+  ? new URL(project.data.canonical, baseUrl).toString()
+  : projectUrl;
+const allProjects = (await getCollection("projects", ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const currentIndex = allProjects.findIndex((item) => item.id === project.id);
+const previousProject = currentIndex > 0 ? allProjects[currentIndex - 1] : undefined;
+const nextProject = currentIndex >= 0 && currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : undefined;
+const relatedProjects = allProjects.filter((item) => item.id !== project.id && (item.data.category === project.data.category || item.data.services.some((service) => project.data.services.includes(service)))).slice(0, 3);
+const pageTitle = project.data.seoTitle || project.data.title;
+const pageDescription = project.data.seoDescription || project.data.description;
+---
+<BaseLayout title={pageTitle} description={pageDescription} canonical={canonicalUrl} noindex={project.data.noindex} image={project.data.ogImage || project.data.coverImage || settings.defaultImage} imageAlt={project.data.coverImageAlt || project.data.title}>
+  <Fragment slot="head"><BreadcrumbSchema items={[{ name: "الرئيسية", url: new URL("/", baseUrl).toString() }, { name: "المشاريع", url: new URL("/projects/", baseUrl).toString() }, { name: project.data.title, url: projectUrl }]} /></Fragment>
+  <main id="main-content"><Breadcrumbs items={[{ label: "الرئيسية", href: "/" }, { label: "المشاريع", href: "/projects/" }, { label: project.data.title }]} /><article><header class="project-hero"><div class="container"><span>{project.data.category}</span><h1>{project.data.title}</h1><p>{project.data.description}</p></div></header>{project.data.coverImage && <div class="container"><figure class="cover"><SmartImage src={project.data.coverImage} alt={project.data.coverImageAlt || project.data.title} width={1200} height={800} sizes="(min-width: 1100px) 1100px, 100vw" role="project" priority /></figure></div>}<div class="container project-layout section"><div><div class="prose"><Content /></div>{project.data.gallery.length > 0 && <section class="gallery-section"><h2>صور من المشروع</h2><div class="gallery">{project.data.gallery.map((item) => <figure><a href={item.image} target="_blank" rel="noopener noreferrer"><SmartImage src={item.image} alt={item.alt} width={900} height={680} sizes="(min-width: 760px) 50vw, 100vw" role="project" /></a><figcaption>{item.alt}</figcaption></figure>)}</div></section>}<PostContactButtons phone={settings.phone} phoneDisplay={settings.phoneDisplay} whatsapp={settings.whatsapp} title="هل تريد تنفيذ مشروع مشابه؟" whatsappMessage={`مرحبًا، أريد الاستفسار عن مشروع مشابه لـ ${project.data.title}`} /><ProjectNavigation previous={previousProject ? { title: previousProject.data.title, href: `/projects/${previousProject.id}/` } : undefined} next={nextProject ? { title: nextProject.data.title, href: `/projects/${nextProject.id}/` } : undefined} /><RelatedProjects projects={relatedProjects} /></div><aside>{project.data.location && <p><strong>الموقع</strong><span>{project.data.location}</span></p>}{project.data.completionDate && <p><strong>تاريخ الإنجاز</strong><span>{project.data.completionDate.toLocaleDateString(settings.locale, { year: "numeric", month: "long" })}</span></p>}{project.data.services.length > 0 && <><h2>الخدمات المنفذة</h2><ul>{project.data.services.map((service) => <li>{service}</li>)}</ul></>}</aside></div></article></main>
+</BaseLayout>
+<style>
+  .project-hero { padding-block: clamp(3rem, 8vw, 6rem); background: var(--color-surface); text-align: center; }
+  .project-hero .container { max-width: 900px; }
+  .project-hero span { color: var(--color-primary-dark); font-weight: 800; }
+  h1 { margin-block: .65rem 1rem; font-size: clamp(2.2rem, 7vw, 4.5rem); }
+  .project-hero p { color: var(--color-text-muted); }
+  .cover { overflow: hidden; margin-block: -2rem 0; border: 1px solid var(--color-border); border-radius: 2rem; box-shadow: var(--shadow-md); }
+  .cover :global(img) { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+  .project-layout { display: grid; gap: 2.5rem; align-items: start; }
+  aside { position: sticky; top: 95px; padding: 1.35rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  aside p { display: grid; gap: .1rem; }
+  aside span { color: var(--color-text-muted); }
+  aside h2 { font-size: 1.2rem; }
+  aside ul { padding-inline-start: 1.2rem; }
+  .gallery-section { margin-top: 3rem; }
+  .gallery { display: grid; gap: 1rem; }
+  .gallery figure { overflow: hidden; margin: 0; border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+  .gallery :global(img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .gallery figcaption { padding: .7rem .9rem; color: var(--color-text-muted); font-size: .84rem; }
+  @media (min-width: 760px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 930px) { .project-layout { grid-template-columns: minmax(0, 1fr) minmax(270px, .32fr); } }
+</style>

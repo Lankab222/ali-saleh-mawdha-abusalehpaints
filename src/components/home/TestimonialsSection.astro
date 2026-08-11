@@ -1,0 +1,66 @@
+---
+import SmartImage from "../common/SmartImage.astro";
+
+interface Testimonial {
+  name: string;
+  role?: string;
+  company?: string;
+  rating: number;
+  image?: string;
+  quote: string;
+}
+interface Props { items: Testimonial[]; }
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <section class="section testimonials-section">
+    <div class="container">
+      <header>
+        <span>آراء العملاء</span>
+        <h2>تجارب موثقة بعد إضافة تقييمات حقيقية</h2>
+      </header>
+      <div class="testimonials-grid">
+        {items.map((item) => (
+          <article>
+            <div class="rating" aria-label={`التقييم ${item.rating} من 5`}>{"★".repeat(item.rating)}</div>
+            <blockquote>{item.quote}</blockquote>
+            <footer>
+              {item.image && (
+                <SmartImage
+                  src={item.image}
+                  alt={`صورة ${item.name}`}
+                  width={52}
+                  height={52}
+                  sizes="52px"
+                  role="content"
+                  watermark={false}
+                />
+              )}
+              <div>
+                <strong>{item.name}</strong>
+                {(item.role || item.company) && <span>{[item.role, item.company].filter(Boolean).join(" - ")}</span>}
+              </div>
+            </footer>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .testimonials-section { background: var(--color-surface); }
+  header { margin-bottom: 2rem; }
+  header span { color: var(--color-primary-dark); font-weight: 800; }
+  header h2 { margin-block: .5rem 0; font-size: clamp(2rem, 5vw, 3.2rem); }
+  .testimonials-grid { display: grid; gap: 1rem; }
+  article { padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: white; }
+  .rating { margin-bottom: .8rem; color: #b7791f; }
+  blockquote { margin: 0 0 1.2rem; }
+  footer { display: flex; align-items: center; gap: .75rem; }
+  footer :global(img) { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+  footer > div { display: grid; gap: .1rem; }
+  footer span { color: var(--color-text-muted); font-size: .85rem; }
+  @media (min-width: 760px) { .testimonials-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

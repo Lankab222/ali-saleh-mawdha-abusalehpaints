@@ -1,0 +1,29 @@
+{
+  "siteName": "اسم النشاط التجاري",
+  "siteTitle": "اسم النشاط التجاري | الخدمة الرئيسية في المدينة",
+  "description": "وصف مختصر ودقيق للنشاط والخدمات والمنطقة المستهدفة.",
+  "siteUrl": "https://example.com",
+  "locale": "ar-SA",
+  "city": "المدينة",
+  "region": "المنطقة",
+  "country": "SA",
+  "serviceAreas": [
+    "المدينة"
+  ],
+  "openingHours": "يوميًا حسب مواعيد العمل",
+  "priceRange": "حسب نطاق العمل",
+  "phone": "+966500000000",
+  "phoneDisplay": "0500000000",
+  "whatsapp": "966500000000",
+  "email": "info@example.com",
+  "address": "المدينة، المملكة العربية السعودية",
+  "googleBusinessProfileUrl": "",
+  "facebook": "",
+  "instagram": "",
+  "x": "",
+  "youtube": "",
+  "primaryColor": "#8a6a32",
+  "repo": "OWNER/REPOSITORY",
+  "oauthBaseUrl": "https://YOUR-OAUTH-WORKER.workers.dev",
+  "businessType": "HomeAndConstructionBusiness"
+}

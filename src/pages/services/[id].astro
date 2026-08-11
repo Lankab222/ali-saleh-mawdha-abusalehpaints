@@ -1,0 +1,72 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, getEntry, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ServiceSchema from "../../components/schema/ServiceSchema.astro";
+import BreadcrumbSchema from "../../components/schema/BreadcrumbSchema.astro";
+import FaqSchema from "../../components/schema/FaqSchema.astro";
+import Breadcrumbs from "../../components/common/Breadcrumbs.astro";
+import RelatedServices from "../../components/services/RelatedServices.astro";
+import PostContactButtons from "../../components/blog/PostContactButtons.astro";
+import SmartImage from "../../components/common/SmartImage.astro";
+
+export const getStaticPaths = (async () => {
+  const services = await getCollection("services", ({ data }) => !data.draft);
+  return services.map((service) => ({ params: { id: service.id }, props: { service } }));
+}) satisfies GetStaticPaths;
+
+const { service } = Astro.props;
+const { Content } = await render(service);
+const settingsEntry = await getEntry("settings", "site");
+if (!settingsEntry) throw new Error("ملف إعدادات الموقع غير موجود");
+const settings = settingsEntry.data;
+const baseUrl = Astro.site?.toString() ?? settings.siteUrl;
+const serviceUrl = new URL(`/services/${service.id}/`, baseUrl).toString();
+const canonicalUrl = service.data.canonical
+  ? new URL(service.data.canonical, baseUrl).toString()
+  : serviceUrl;
+const serviceImage = new URL(service.data.image || settings.defaultImage, baseUrl).toString();
+const pageTitle = service.data.seoTitle || service.data.title;
+const pageDescription = service.data.seoDescription || service.data.description;
+const relatedServices = (await getCollection("services", ({ data }) => !data.draft))
+  .filter((item) => item.id !== service.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+---
+<BaseLayout title={pageTitle} description={pageDescription} canonical={canonicalUrl} noindex={service.data.noindex} image={service.data.ogImage || service.data.image || settings.defaultImage} imageAlt={service.data.imageAlt || service.data.title}>
+  <Fragment slot="head">
+    <ServiceSchema name={service.data.title} description={pageDescription} url={canonicalUrl} image={serviceImage} providerName={settings.siteName} providerUrl={baseUrl} areaServed={service.data.serviceArea.length ? service.data.serviceArea : settings.serviceAreas} />
+    <BreadcrumbSchema items={[{ name: "الرئيسية", url: new URL("/", baseUrl).toString() }, { name: "الخدمات", url: new URL("/services/", baseUrl).toString() }, { name: service.data.title, url: serviceUrl }]} />
+    <FaqSchema items={service.data.faq} />
+  </Fragment>
+  <main id="main-content">
+    <Breadcrumbs items={[{ label: "الرئيسية", href: "/" }, { label: "الخدمات", href: "/services/" }, { label: service.data.title }]} />
+    <article>
+      <header class="service-hero"><div class="container"><span>{`خدماتنا في ${settings.city}`}</span><h1>{service.data.title}</h1><p>{service.data.description}</p></div></header>
+      {service.data.image && <div class="container"><figure class="service-image"><SmartImage src={service.data.image} alt={service.data.imageAlt || service.data.title} width={1200} height={675} sizes="(min-width: 1100px) 1100px, 100vw" role="service" priority /></figure></div>}
+      <div class="container service-layout section"><div><div class="prose"><Content /></div>{service.data.faq.length > 0 && <section class="faq"><h2>أسئلة شائعة عن الخدمة</h2>{service.data.faq.map((item) => <details><summary>{item.question}</summary><p>{item.answer}</p></details>)}</section>}<PostContactButtons phone={settings.phone} phoneDisplay={settings.phoneDisplay} whatsapp={settings.whatsapp} title={`هل تحتاج إلى ${service.data.title}؟`} whatsappMessage={`مرحبًا، أريد الاستفسار عن خدمة ${service.data.title}`} /><RelatedServices services={relatedServices} /></div>{service.data.features.length > 0 && <aside><h2>ما تشمل الخدمة</h2><ul>{service.data.features.map((feature) => <li><span aria-hidden="true">✓</span>{feature}</li>)}</ul><a href="/contact/">اطلب المعاينة</a></aside>}</div>
+    </article>
+  </main>
+</BaseLayout>
+<style>
+  .service-hero { padding-block: clamp(3.2rem, 8vw, 6rem); background: radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--color-primary) 13%, transparent), transparent 38%), var(--color-surface); text-align: center; }
+  .service-hero .container { max-width: 900px; }
+  .service-hero span { color: var(--color-primary-dark); font-weight: 800; }
+  .service-hero h1 { margin-block: .65rem 1rem; font-size: clamp(2.2rem, 7vw, 4.5rem); text-wrap: balance; }
+  .service-hero p { margin: 0; color: var(--color-text-muted); font-size: 1.08rem; }
+  .service-image { overflow: hidden; margin-block: -2rem 0; border: 1px solid var(--color-border); border-radius: 2rem; background: white; box-shadow: var(--shadow-md); }
+  .service-image :global(img) { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .service-layout { display: grid; gap: 2.5rem; align-items: start; }
+  aside { position: sticky; top: 95px; padding: 1.35rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  aside h2 { font-size: 1.25rem; }
+  aside ul { display: grid; gap: .6rem; padding: 0; list-style: none; }
+  aside li { display: flex; gap: .55rem; }
+  aside li span { color: var(--color-primary-dark); }
+  aside a { display: flex; min-height: 48px; align-items: center; justify-content: center; margin-top: 1rem; border-radius: var(--radius-md); background: var(--color-primary); color: white; font-weight: 850; }
+  .faq { margin-top: 3rem; }
+  .faq h2 { font-size: clamp(1.6rem, 4vw, 2.25rem); }
+  .faq details { margin-bottom: .65rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+  .faq summary { cursor: pointer; padding: 1rem; font-weight: 800; }
+  .faq p { margin: 0; padding: 0 1rem 1rem; color: var(--color-text-muted); }
+  @media (min-width: 930px) { .service-layout { grid-template-columns: minmax(0, 1fr) minmax(280px, .34fr); } }
+</style>

@@ -1,0 +1,181 @@
+---
+import JsonLd from "./JsonLd.astro";
+
+type PageType = "WebPage" | "AboutPage" | "ContactPage" | "CollectionPage";
+
+interface PostalAddress {
+  addressLocality?: string;
+  addressRegion?: string;
+  addressCountry?: string;
+}
+
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+interface CollectionItem {
+  name: string;
+  url: string;
+  description?: string;
+  image?: string;
+}
+
+interface Props {
+  siteName: string;
+  siteUrl?: string;
+  siteDescription: string;
+  locale?: string;
+  country?: string;
+  businessType?: string;
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  logo?: string;
+  businessImage?: string;
+  phone?: string;
+  email?: string;
+  priceRange?: string;
+  address?: PostalAddress;
+  areaServed?: string[];
+  services?: string[];
+  sameAs?: string[];
+  pageImage?: string;
+  pageType?: PageType;
+  breadcrumbs?: BreadcrumbItem[];
+  collectionItems?: CollectionItem[];
+}
+
+const {
+  siteName,
+  siteUrl,
+  siteDescription,
+  locale = "ar-SA",
+  country = "SA",
+  businessType = "LocalBusiness",
+  title,
+  description,
+  canonicalUrl,
+  logo = "/uploads/logo.webp",
+  businessImage = "/uploads/hero.webp",
+  phone,
+  email,
+  priceRange,
+  address,
+  areaServed = [],
+  services = [],
+  sameAs = [],
+  pageImage,
+  pageType = "WebPage",
+  breadcrumbs = [],
+  collectionItems = [],
+} = Astro.props;
+
+const baseUrl = (siteUrl ?? Astro.site?.toString() ?? "https://example.com").replace(/\/+$/, "");
+const absolute = (value: string) => new URL(value, `${baseUrl}/`).toString();
+const pageUrl = canonicalUrl ? absolute(canonicalUrl) : absolute(Astro.url.pathname);
+const homeUrl = `${baseUrl}/`;
+const organizationId = `${homeUrl}#organization`;
+const websiteId = `${homeUrl}#website`;
+const webpageId = `${pageUrl}#webpage`;
+const logoUrl = absolute(logo);
+const businessImageUrl = absolute(businessImage);
+const pageImageUrl = absolute(pageImage || businessImage);
+
+const graph: Record<string, unknown>[] = [
+  {
+    "@type": businessType,
+    "@id": organizationId,
+    name: siteName,
+    url: homeUrl,
+    description: siteDescription,
+    logo: {
+      "@type": "ImageObject",
+      url: logoUrl,
+    },
+    image: businessImageUrl,
+    ...(phone && { telephone: phone }),
+    ...(email && { email }),
+    ...(priceRange && { priceRange }),
+    ...(address && {
+      address: {
+        "@type": "PostalAddress",
+        ...address,
+      },
+    }),
+    ...(areaServed.length > 0 && {
+      areaServed: areaServed.map((name) => ({
+        "@type": "City",
+        name,
+      })),
+    }),
+    ...(services.length > 0 && { knowsAbout: services }),
+    ...(sameAs.filter(Boolean).length > 0 && { sameAs: sameAs.filter(Boolean) }),
+    ...(phone && {
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: phone,
+        contactType: "customer service",
+        areaServed: country,
+        availableLanguage: [locale.split("-")[0] || "ar"],
+      },
+    }),
+  },
+  {
+    "@type": "WebSite",
+    "@id": websiteId,
+    url: homeUrl,
+    name: siteName,
+    description: siteDescription,
+    inLanguage: locale,
+    publisher: { "@id": organizationId },
+  },
+  {
+    "@type": pageType,
+    "@id": webpageId,
+    url: pageUrl,
+    name: title,
+    description,
+    inLanguage: locale,
+    isPartOf: { "@id": websiteId },
+    about: { "@id": organizationId },
+    primaryImageOfPage: {
+      "@type": "ImageObject",
+      url: pageImageUrl,
+    },
+  },
+];
+
+if (breadcrumbs.length > 0) {
+  graph.push({
+    "@type": "BreadcrumbList",
+    "@id": `${pageUrl}#breadcrumb`,
+    itemListElement: breadcrumbs.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absolute(item.url),
+    })),
+  });
+}
+
+if (collectionItems.length > 0) {
+  graph.push({
+    "@type": "ItemList",
+    "@id": `${pageUrl}#itemlist`,
+    itemListElement: collectionItems.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "WebPage",
+        name: item.name,
+        url: absolute(item.url),
+        ...(item.description && { description: item.description }),
+        ...(item.image && { image: absolute(item.image) }),
+      },
+    })),
+  });
+}
+---
+
+<JsonLd data={{ "@context": "https://schema.org", "@graph": graph }} />

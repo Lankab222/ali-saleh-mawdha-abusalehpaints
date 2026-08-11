@@ -1,0 +1,53 @@
+---
+interface Props { categories: string[]; }
+const { categories } = Astro.props;
+---
+<section class="blog-filters" aria-label="البحث وتصفية المقالات">
+  <div><label for="blog-search">ابحث في المقالات</label><input id="blog-search" type="search" placeholder="اكتب عنوانًا أو كلمة..." autocomplete="off" data-blog-search /></div>
+  {categories.length > 0 && <div class="categories"><button type="button" class="active" data-category-filter="all">الكل</button>{categories.map((category) => <button type="button" data-category-filter={category}>{category}</button>)}</div>}
+  <p data-filter-status></p>
+</section>
+<script>
+  function initBlogFilters() {
+    const root = document.querySelector<HTMLElement>(".blog-filters");
+    if (!root || root.dataset.initialized === "true") return;
+    root.dataset.initialized = "true";
+    const input = root.querySelector<HTMLInputElement>("[data-blog-search]");
+    const buttons = root.querySelectorAll<HTMLButtonElement>("[data-category-filter]");
+    const posts = document.querySelectorAll<HTMLElement>("[data-blog-post]");
+    const status = root.querySelector<HTMLElement>("[data-filter-status]");
+    let activeCategory = "all";
+    const normalize = (value: string) => value.toLocaleLowerCase("ar").trim();
+    const apply = () => {
+      const query = normalize(input?.value || "");
+      let count = 0;
+      posts.forEach((post) => {
+        const text = normalize(post.dataset.searchText || "");
+        const category = post.dataset.category || "";
+        const visible = (!query || text.includes(query)) && (activeCategory === "all" || category === activeCategory);
+        post.hidden = !visible;
+        if (visible) count += 1;
+      });
+      if (status) status.textContent = count ? `عدد النتائج: ${count}` : "لا توجد مقالات مطابقة.";
+    };
+    input?.addEventListener("input", apply);
+    buttons.forEach((button) => button.addEventListener("click", () => {
+      activeCategory = button.dataset.categoryFilter || "all";
+      buttons.forEach((item) => item.classList.toggle("active", item === button));
+      apply();
+    }));
+    apply();
+  }
+  initBlogFilters();
+  document.addEventListener("astro:page-load", initBlogFilters);
+</script>
+<style>
+  .blog-filters { display: grid; gap: 1.1rem; margin-bottom: 2rem; padding: 1.2rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .blog-filters > div:first-child { display: grid; gap: .45rem; }
+  label { font-weight: 800; }
+  input { width: 100%; min-height: 50px; padding-inline: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: white; color: var(--color-text); }
+  .categories { display: flex; flex-wrap: wrap; gap: .5rem; }
+  button { min-height: 40px; padding-inline: .85rem; border: 1px solid var(--color-border); border-radius: 999px; background: white; color: var(--color-text-muted); font-size: .88rem; font-weight: 700; }
+  button.active, button:hover { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+  p { margin: 0; color: var(--color-text-muted); font-size: .88rem; }
+</style>

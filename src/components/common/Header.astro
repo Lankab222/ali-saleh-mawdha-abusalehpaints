@@ -1,0 +1,302 @@
+---
+interface Props {
+  siteName: string;
+  logo?: string;
+  phone?: string;
+}
+
+const { siteName, logo, phone } = Astro.props;
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { label: "الرئيسية", href: "/" },
+  { label: "الخدمات", href: "/services/" },
+  { label: "المشاريع", href: "/projects/" },
+  { label: "المقالات", href: "/blog/" },
+  { label: "من نحن", href: "/about/" },
+  { label: "تواصل معنا", href: "/contact/" },
+];
+const isActive = (href: string) =>
+  href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+---
+
+<header class="site-header" data-site-header>
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label={`الصفحة الرئيسية لموقع ${siteName}`}>
+      {
+        logo && (
+          <img src={logo} alt={`شعار ${siteName}`} width="48" height="48" />
+        )
+      }
+      <span>{siteName}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="التنقل الرئيسي">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class:list={{ active: isActive(item.href) }}
+            aria-current={isActive(item.href) ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-actions">
+      {
+        phone && (
+          <a class="call-button" href={`tel:${phone}`}>
+            اتصل الآن
+          </a>
+        )
+      }
+      <button
+        class="menu-button"
+        type="button"
+        aria-label="فتح القائمة"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-button
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav
+    id="mobile-menu"
+    class="mobile-menu"
+    aria-label="قائمة الجوال"
+    data-mobile-menu
+    hidden
+  >
+    <div class="container mobile-menu__inner">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class:list={{ active: isActive(item.href) }}
+            aria-current={isActive(item.href) ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      {
+        phone && (
+          <a class="mobile-call" href={`tel:${phone}`}>
+            اتصال مباشر
+          </a>
+        )
+      }
+    </div>
+  </nav>
+</header>
+
+<script>
+  function initHeader() {
+    const header = document.querySelector<HTMLElement>("[data-site-header]");
+    if (!header) return;
+    const button =
+      header.querySelector<HTMLButtonElement>("[data-menu-button]");
+    const menu = header.querySelector<HTMLElement>("[data-mobile-menu]");
+    if (!button || !menu) return;
+
+    const setOpen = (open: boolean) => {
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-label", open ? "إغلاق القائمة" : "فتح القائمة");
+      menu.hidden = !open;
+      document.body.classList.toggle("menu-open", open);
+    };
+
+    setOpen(false);
+    if (button.dataset.initialized === "true") return;
+    button.dataset.initialized = "true";
+
+    button.addEventListener("click", () => {
+      setOpen(button.getAttribute("aria-expanded") !== "true");
+    });
+    menu
+      .querySelectorAll("a")
+      .forEach((link) => link.addEventListener("click", () => setOpen(false)));
+    document.addEventListener("keydown", (event) => {
+      if (
+        event.key === "Escape" &&
+        button.getAttribute("aria-expanded") === "true"
+      ) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 900) setOpen(false);
+    });
+  }
+
+  initHeader();
+  document.addEventListener("astro:page-load", initHeader);
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--color-border);
+    background: rgb(255 255 255 / 94%);
+    box-shadow: 0 4px 20px rgb(32 26 18 / 5%);
+    backdrop-filter: blur(14px);
+  }
+  .header-inner {
+    display: flex;
+    min-height: 74px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .brand {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 900;
+  }
+  .brand img {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 auto;
+    object-fit: contain;
+  }
+  .brand span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .desktop-nav a {
+    position: relative;
+    padding-block: 0.6rem;
+    color: var(--color-text-muted);
+    font-size: 0.94rem;
+    font-weight: 750;
+  }
+  .desktop-nav a:hover,
+  .desktop-nav a.active {
+    color: var(--color-primary);
+  }
+  .desktop-nav a.active::after {
+    position: absolute;
+    right: 0;
+    bottom: -0.45rem;
+    left: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-primary);
+    content: "";
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .call-button {
+    display: none;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: 1rem;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: white;
+    font-weight: 800;
+  }
+  .menu-button {
+    display: inline-flex;
+    width: 46px;
+    height: 46px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--color-text);
+  }
+  .menu-button span {
+    display: block;
+    width: 21px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transition:
+      transform var(--transition),
+      opacity var(--transition);
+  }
+  .menu-button[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .menu-button[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+  .menu-button[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+  .mobile-menu {
+    border-top: 1px solid var(--color-border);
+    background: white;
+    box-shadow: 0 16px 32px rgb(32 26 18 / 9%);
+  }
+  .mobile-menu[hidden] {
+    display: none !important;
+  }
+  .mobile-menu__inner {
+    display: grid;
+    gap: 0.4rem;
+    padding-block: 0.9rem 1.2rem;
+  }
+  .mobile-menu a {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-weight: 750;
+  }
+  .mobile-menu a:hover,
+  .mobile-menu a.active {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+  .mobile-menu .mobile-call {
+    justify-content: center;
+    margin-top: 0.35rem;
+    background: var(--color-primary);
+    color: white;
+  }
+  @media (min-width: 900px) {
+    .desktop-nav {
+      display: flex;
+    }
+    .call-button {
+      display: inline-flex;
+    }
+    .menu-button,
+    .mobile-menu {
+      display: none !important;
+    }
+  }
+  @media (max-width: 430px) {
+    .brand span {
+      max-width: 190px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
